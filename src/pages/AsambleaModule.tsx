@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Cloud, Clock, History, FileText, CheckSquare, ListTodo, ToggleLeft, ToggleRight, Plus, GripVertical, Minus } from 'lucide-react';
+import { Cloud, Clock, History, FileText, CheckSquare, ToggleLeft, ToggleRight, GripVertical } from 'lucide-react';
 
 interface AgendaItem { id: number; title: string; timeEstimate: string; checked: boolean; }
 

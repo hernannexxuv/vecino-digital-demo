@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, TrendingDown, Wallet, Calendar, Receipt, Eye, Plus, X, Clock, FileImage } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage } from 'lucide-react';
 
 interface Transaction { id: number; description: string; amount: string; type: 'income' | 'expense'; date: string; hasReceipt: boolean; }
 
@@ -11,7 +11,6 @@ const MOCK_TRANSACTIONS: Transaction[] = [
 
 export default function BilleteraModule() {
   const [showModal, setShowModal] = useState(false);
-  const [newType, setNewType] = useState<'income' | 'expense'>('income');
 
   return (
     <div className="h-full flex flex-col">
