@@ -19,7 +19,7 @@ export default function FirmaModule() {
   const totalCount = attendees.length;
 
   return (
-    <div className="h-full flex flex-col lg:flex-row gap-0 overflow-hidden rounded-2xl border border-slate-200 shadow-apple">
+    <div className="flex flex-col lg:flex-row gap-0 overflow-hidden rounded-2xl border border-slate-200 shadow-apple lg:h-full">
       {/* Left Side - Vista Secretario */}
       <div className="flex-1 bg-white border-r border-slate-200 flex flex-col min-w-0 overflow-hidden">
         <div className="p-6 border-b border-slate-100">

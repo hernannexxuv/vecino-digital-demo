@@ -16,7 +16,7 @@ const recentActivity = [
 
 export default function DidecoDashboard() {
   return (
-    <div className="h-full flex flex-col gap-6">
+    <div className="flex flex-col gap-6 lg:h-full">
       
       {/* Header Panel - Aligerado */}
       <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-apple flex items-center justify-between">
@@ -55,10 +55,10 @@ export default function DidecoDashboard() {
       </div>
 
       {/* Grid Principal: Mapa y Actividad */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:min-h-0">
         
         {/* Mapa Territorial */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-apple flex flex-col overflow-hidden">
+        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-apple flex flex-col overflow-hidden min-h-[300px] lg:min-h-0">
           <div className="p-6 border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-primary-light flex items-center justify-center">

@@ -10,7 +10,7 @@ const sectoresTemuco = [
 
 export default function MapaComunal() {
   return (
-    <div className="h-full flex flex-col gap-6">
+    <div className="flex flex-col gap-6 lg:h-full">
       
       {/* Header del Mapa */}
       <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-apple flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -40,7 +40,7 @@ export default function MapaComunal() {
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 lg:min-h-0">
         
         {/* Sidebar de Sectores (Panel Izquierdo) */}
         <div className="lg:col-span-1 bg-white rounded-3xl border border-slate-100 shadow-apple flex flex-col overflow-hidden">
@@ -70,7 +70,7 @@ export default function MapaComunal() {
         </div>
 
         {/* Viewport del Mapa Simulado (Panel Derecho) */}
-        <div className="lg:col-span-3 bg-slate-100 rounded-3xl border border-slate-200 shadow-inner flex flex-col overflow-hidden relative">
+        <div className="lg:col-span-3 bg-slate-100 rounded-3xl border border-slate-200 shadow-inner flex flex-col overflow-hidden relative min-h-[400px] lg:min-h-0">
           
           {/* Overlay de Herramientas del Mapa */}
           <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-10">

@@ -30,7 +30,7 @@ export default function AsambleaModule() {
   };
 
   return (
-    <div className="h-full flex flex-col lg:flex-row gap-6">
+    <div className="flex flex-col lg:flex-row gap-6 lg:h-full">
       {/* Main Content - Acta en Vivo */}
       <div className="flex-1 flex flex-col min-w-0">
         <div className="flex items-center justify-between mb-6">

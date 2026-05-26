@@ -8,7 +8,7 @@ const avisosBarrio = [
 
 export default function VecinoDashboard() {
   return (
-    <div className="h-full flex flex-col gap-6">
+    <div className="flex flex-col gap-6 lg:h-full">
       
       {/* Header Saludo */}
       <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-apple flex items-center justify-between">
@@ -25,7 +25,7 @@ export default function VecinoDashboard() {
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:min-h-0">
         
         {/* Columna Izquierda: Credencial Digital Aligerada */}
         <div className="lg:col-span-1 flex flex-col gap-6">

@@ -13,7 +13,7 @@ export default function BilleteraModule() {
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col lg:h-full">
       {/* Tarjetas de Resumen */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-apple p-5">
