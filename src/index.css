@@ -48,3 +48,19 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
+
+@utility card-apple {
+  @apply bg-white rounded-3xl border border-slate-100 shadow-apple transition-all duration-200 hover:shadow-apple-md;
+}
+
+@utility btn-apple-primary {
+  @apply bg-primary text-white font-bold rounded-2xl shadow-apple transition-all active:scale-[0.98] hover:bg-primary-dark;
+}
+
+@utility btn-apple-secondary {
+  @apply bg-slate-50 text-slate-700 font-bold rounded-2xl border border-slate-200 hover:bg-slate-100 transition-all active:scale-[0.98];
+}
+
+@utility glass-apple {
+  @apply bg-white/60 backdrop-blur-xl border border-white/40 shadow-apple-md;
+}

@@ -138,7 +138,7 @@ export default function DidecoDashboard() {
       {/* ========================================== */}
       {showComunicadoModal && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-apple-lg w-full max-w-lg overflow-hidden flex flex-col border border-slate-100">
+          <div className="bg-white/70 backdrop-blur-2xl border border-white/50 shadow-apple-lg w-full max-w-lg overflow-hidden flex flex-col glass-apple">
             
             {/* Header del Modal */}
             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">

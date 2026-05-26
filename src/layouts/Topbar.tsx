@@ -41,18 +41,18 @@ export default function Topbar({ currentRole, setCurrentRole, toggleSidebar }: T
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
-        {/* Selector de Simulación teñido de Primary (Azul Temuco) */}
-        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-2 md:px-3 py-1.5 gap-1 md:gap-2 shadow-inner shrink-0">
-          <Shield size={14} className="text-primary animate-blink shrink-0 md:w-4 md:h-4" />
-          <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest hidden lg:inline shrink-0">Demo:</span>
+        {/* Selector de Roles con estética Glassmorphic */}
+        <div className="relative flex items-center glass-apple rounded-2xl px-3 py-1.5 gap-2 cursor-pointer hover:bg-white/80 transition-colors">
+          <Shield size={16} className="text-primary animate-blink shrink-0 md:w-4 md:h-4" />
+          <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest hidden md:inline shrink-0">Demo:</span>
           <select
             value={currentRole}
             onChange={(e) => handleRoleChange(e.target.value as Role)}
             className="bg-transparent text-xs md:text-sm font-semibold text-slate-900 focus:outline-none pr-5 md:pr-6 cursor-pointer appearance-none"
           >
-            <option value="municipalidad">DIDECO</option>
-            <option value="directiva">Directiva</option>
-            <option value="vecino">Vecino</option>
+            <option value="municipalidad">DIDECO (Muni)</option>
+            <option value="directiva">Junta de Vecinos</option>
+            <option value="vecino">Vecino Ciudadano</option>
           </select>
           <ChevronDown size={14} className="text-slate-400 absolute right-2 pointer-events-none" />
         </div>
