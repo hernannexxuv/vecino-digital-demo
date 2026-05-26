@@ -143,8 +143,14 @@ export default function DidecoDashboard() {
       {/* MODAL: EMISIÓN DE COMUNICADOS (Recomendación 3) */}
       {/* ========================================== */}
       {showComunicadoModal && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-white/70 backdrop-blur-2xl border border-white/50 shadow-apple-lg w-full max-w-lg overflow-hidden flex flex-col glass-apple">
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
+          onClick={() => setShowComunicadoModal(false)}
+        >
+          <div 
+            className="bg-white/90 backdrop-blur-2xl border border-white/50 shadow-apple-lg w-full max-w-lg overflow-hidden flex flex-col rounded-3xl glass-apple"
+            onClick={(e) => e.stopPropagation()}
+          >
             
             {/* Header del Modal */}
             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
@@ -180,7 +186,7 @@ export default function DidecoDashboard() {
                     { value: 'especificas', label: 'Juntas de Vecinos Específicas...' }
                   ]}
                   className="w-full bg-white/70 backdrop-blur-md border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-white transition-all cursor-pointer shadow-sm"
-                  dropdownClassName="bg-white/90 backdrop-blur-xl"
+                  dropdownClassName="bg-white/95 backdrop-blur-3xl border-slate-200 shadow-apple-lg"
                 />
               </div>
 
@@ -196,7 +202,7 @@ export default function DidecoDashboard() {
                       { value: 'alerta', label: 'Alerta Temprana (Urgente)' }
                     ]}
                     className="w-full bg-white/70 backdrop-blur-md border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-white transition-all cursor-pointer shadow-sm"
-                    dropdownClassName="bg-white/90 backdrop-blur-xl"
+                    dropdownClassName="bg-white/95 backdrop-blur-3xl border-slate-200 shadow-apple-lg"
                   />
                 </div>
                 <div>
@@ -211,7 +217,7 @@ export default function DidecoDashboard() {
                       { value: 'alcaldia', label: 'Gabinete Alcaldía' }
                     ]}
                     className="w-full bg-white/70 backdrop-blur-md border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-white transition-all cursor-pointer shadow-sm"
-                    dropdownClassName="bg-white/90 backdrop-blur-xl"
+                    dropdownClassName="bg-white/95 backdrop-blur-3xl border-slate-200 shadow-apple-lg"
                   />
                 </div>
               </div>

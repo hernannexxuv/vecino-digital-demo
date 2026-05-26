@@ -41,7 +41,7 @@ export default function SelectDropdown({
   }, []);
 
   return (
-    <div className={`relative ${className}`} ref={ref}>
+    <div className={`relative ${className} ${isOpen ? 'z-50' : 'z-10'}`} ref={ref}>
       {/* NATIVE SELECT FOR MOBILE - Se superpone invisible para atrapar el tap en celulares */}
       <select
         value={value}
