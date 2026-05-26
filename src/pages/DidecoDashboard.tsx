@@ -1,4 +1,5 @@
-import { Target, Users, MapPin, CheckCircle2, CloudLightning, Activity, ChevronRight, FileText, BarChart3 } from 'lucide-react';
+import { useState } from 'react';
+import { Target, Users, MapPin, CheckCircle2, CloudLightning, Activity, ChevronRight, FileText, BarChart3, Send, Megaphone, X } from 'lucide-react';
 
 const comunalMetrics = [
   { id: 1, label: 'Juntas de Vecinos Activas', value: '142', icon: Target, color: 'text-primary', bg: 'bg-primary-light' },
@@ -15,13 +16,15 @@ const recentActivity = [
 ];
 
 export default function DidecoDashboard() {
+  // Estado para controlar la visibilidad del Modal de Comunicados
+  const [showComunicadoModal, setShowComunicadoModal] = useState(false);
+
   return (
-    <div className="flex flex-col gap-6 lg:h-full">
+    <div className="flex flex-col gap-6 lg:h-full relative">
       
-      {/* Header Panel - Aligerado */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-apple flex items-center justify-between">
+      {/* Header Panel */}
+      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-apple flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 z-10">
         <div className="flex items-center gap-4">
-          {/* Aquí quitamos el slate-800 pesado y usamos el Azul Temuco */}
           <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white font-black text-xl shadow-apple-md">
             D
           </div>
@@ -30,14 +33,26 @@ export default function DidecoDashboard() {
             <p className="text-sm text-slate-500 mt-0.5">Consolidado de Inteligencia Territorial GovTech.</p>
           </div>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl text-sm font-bold hover:opacity-90 transition-opacity shadow-apple-md">
-          <BarChart3 size={18} />
-          <span>Generar Reporte Comunal</span>
-        </button>
+        
+        {/* Botonera de Acción */}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <button 
+            onClick={() => setShowComunicadoModal(true)}
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-primary text-primary rounded-xl text-sm font-bold hover:bg-primary-light transition-colors shadow-sm"
+          >
+            <Megaphone size={18} />
+            <span>Emitir Comunicado</span>
+          </button>
+          
+          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl text-sm font-bold hover:opacity-90 transition-opacity shadow-apple-md">
+            <BarChart3 size={18} />
+            <span>Generar Reporte</span>
+          </button>
+        </div>
       </div>
 
       {/* Grid de Métricas KPI */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 z-10">
         {comunalMetrics.map((metric) => {
           const Icon = metric.icon;
           return (
@@ -55,7 +70,7 @@ export default function DidecoDashboard() {
       </div>
 
       {/* Grid Principal: Mapa y Actividad */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:min-h-0 z-10">
         
         {/* Mapa Territorial */}
         <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-apple flex flex-col overflow-hidden min-h-[300px] lg:min-h-0">
@@ -74,7 +89,6 @@ export default function DidecoDashboard() {
           
           <div className="flex-1 p-6 flex flex-col">
             <div className="flex-1 bg-slate-50 rounded-2xl p-4 flex items-center justify-center border border-slate-100 relative overflow-hidden group">
-              {/* Luces del mapa usando colores institucionales */}
               <div className="absolute top-1/4 left-1/3 w-32 h-32 rounded-full bg-secondary opacity-20 blur-3xl animate-pulse" />
               <div className="absolute bottom-1/3 right-1/4 w-24 h-24 rounded-full bg-primary opacity-20 blur-2xl animate-pulse" style={{ animationDelay: '1s'}} />
               
@@ -118,6 +132,98 @@ export default function DidecoDashboard() {
           </div>
         </div>
       </div>
+
+      {/* ========================================== */}
+      {/* MODAL: EMISIÓN DE COMUNICADOS (Recomendación 3) */}
+      {/* ========================================== */}
+      {showComunicadoModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-apple-lg w-full max-w-lg overflow-hidden flex flex-col border border-slate-100">
+            
+            {/* Header del Modal */}
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center">
+                  <Megaphone className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 leading-tight">Redactar Comunicado</h3>
+                  <p className="text-xs text-slate-500 font-medium">Push Notification Municipal</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowComunicadoModal(false)}
+                className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Cuerpo del Formulario */}
+            <div className="p-6 space-y-5">
+              
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Alcance Territorial</label>
+                <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
+                  <option>Toda la Comuna de Temuco</option>
+                  <option>Solo Sector Amanecer</option>
+                  <option>Solo Sector Pedro de Valdivia</option>
+                  <option>Juntas de Vecinos Específicas...</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Nivel de Urgencia</label>
+                  <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
+                    <option>Informativo (Estándar)</option>
+                    <option>Evento Comunitario</option>
+                    <option>Alerta Temprana (Urgente)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Departamento</label>
+                  <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
+                    <option>Dpto. Social</option>
+                    <option>Dpto. Deportes</option>
+                    <option>Desarrollo Económico</option>
+                    <option>Gabinete Alcaldía</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Mensaje a Vecinos</label>
+                <textarea 
+                  rows={3} 
+                  placeholder="Ej: Estimados vecinos, la campaña de vacunación de mascotas comenzará mañana a las 10:00 hrs en..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                />
+              </div>
+
+            </div>
+
+            {/* Footer de Acción */}
+            <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
+              <button 
+                onClick={() => setShowComunicadoModal(false)}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={() => setShowComunicadoModal(false)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary-dark transition-colors shadow-apple"
+              >
+                <Send size={16} />
+                <span>Enviar Notificación a 18.730 Vecinos</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 }
