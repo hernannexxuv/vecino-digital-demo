@@ -17,6 +17,19 @@ export function Layout() {
     }
   }, [location.pathname]);
 
+  // Manejar el redimensionamiento de la ventana
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="flex h-screen w-screen bg-gray-50 overflow-hidden font-sans text-gray-900 antialiased relative">
       
