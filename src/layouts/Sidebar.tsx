@@ -43,13 +43,13 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
 
   return (
     <aside className={`
-      bg-white border-r border-slate-100 h-full flex flex-col transition-all duration-300 ease-in-out z-30 shadow-apple
-      ${isOpen ? 'w-64' : 'w-0 -translate-x-full md:w-20 md:translate-x-0'}
+      absolute md:relative bg-white border-r border-slate-100 h-full flex flex-col transition-all duration-300 ease-in-out z-40 shadow-apple
+      ${isOpen ? 'w-64 translate-x-0' : 'w-64 -translate-x-full md:w-20 md:translate-x-0'}
     `}>
-      {/* Header del Sidebar - Usando el Gradiente Sutil de Temuco */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 bg-gradient-to-tr from-white to-primary-light/50">
+      {/* Header del Sidebar */}
+      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 bg-gradient-to-tr from-white to-primary-light/50 shrink-0">
         {isOpen ? (
-          <span className="font-extrabold text-xl tracking-tighter text-slate-900">
+          <span className="font-extrabold text-xl tracking-tighter text-slate-900 truncate">
             SmartCity<span className="text-primary font-black">Temuco</span>
           </span>
         ) : (
@@ -57,13 +57,13 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
         )}
         <button 
           onClick={() => setIsOpen(!isOpen)}
-          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 md:hidden"
+          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 md:hidden shrink-0"
         >
           <Menu size={20} />
         </button>
       </div>
 
-      {/* Menú de Navegación teñido de Primary (Azul Temuco) */}
+      {/* Menú de Navegación */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-hidden">
         {currentMenu.map((item) => {
           const Icon = item.icon;
@@ -79,17 +79,18 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}
               `}
             >
-              <Icon size={20} className={isActive ? 'text-white' : 'text-slate-400'} />
+              <Icon size={20} className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
               {isOpen && <span className="truncate">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-3 border-t border-slate-100">
+      {/* Footer */}
+      <div className="p-3 border-t border-slate-100 shrink-0">
         <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-          <Settings size={20} className="text-slate-400" />
-          {isOpen && <span>Configuración</span>}
+          <Settings size={20} className="text-slate-400 shrink-0" />
+          {isOpen && <span className="truncate">Configuración</span>}
         </button>
       </div>
     </aside>

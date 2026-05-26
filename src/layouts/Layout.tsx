@@ -1,16 +1,33 @@
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import type { Role } from '../data/mockData';
 
 export function Layout() {
-  // Estado local para simular el cambio de rol en tiempo real durante la presentación
   const [currentRole, setCurrentRole] = useState<Role>('municipalidad');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Iniciar cerrado en celulares, abierto en desktop
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  const location = useLocation();
+
+  // Cierra el menú al cambiar de página en móviles
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
+  }, [location.pathname]);
 
   return (
-    <div className="flex h-screen w-screen bg-gray-50 overflow-hidden font-sans text-gray-900 antialiased">
+    <div className="flex h-screen w-screen bg-gray-50 overflow-hidden font-sans text-gray-900 antialiased relative">
+      
+      {/* OVERLAY: Capa oscura para móviles (solo visible si el menú está abierto) */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 md:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Barra Lateral (Navegación) */}
       <Sidebar 
         currentRole={currentRole} 
@@ -18,8 +35,8 @@ export function Layout() {
         setIsOpen={setIsSidebarOpen} 
       />
 
-      {/* Contenedor Principal */}
-      <div className="flex flex-col flex-1 h-full overflow-hidden">
+      {/* Contenedor Principal (con min-w-0 para evitar desbordamientos flex) */}
+      <div className="flex flex-col flex-1 h-full min-w-0 overflow-hidden">
         {/* Barra Superior (Selector de Roles, Notificaciones, Perfil) */}
         <Topbar 
           currentRole={currentRole} 
@@ -28,7 +45,7 @@ export function Layout() {
         />
 
         {/* Contenido Dinámico de la Ruta Actual */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 scrollbar-hidden">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 scrollbar-hidden relative">
           <div className="max-w-7xl mx-auto h-full">
             <Outlet context={{ currentRole }} />
           </div>
