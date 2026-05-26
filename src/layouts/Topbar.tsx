@@ -1,7 +1,8 @@
-import { Menu, Bell, Shield, ChevronDown } from 'lucide-react';
+import { Menu, Bell, Shield } from 'lucide-react';
 import { roleInfo, notifications } from '../data/mockData';
 import type { Role } from '../data/mockData';
 import { useNavigate } from 'react-router-dom';
+import SelectDropdown from '../components/ui/SelectDropdown';
 
 interface TopbarProps {
   currentRole: Role;
@@ -42,20 +43,18 @@ export default function Topbar({ currentRole, setCurrentRole, toggleSidebar }: T
 
       <div className="flex items-center gap-2 md:gap-4">
         {/* Selector de Roles con estética Glassmorphic */}
-        <div className="relative flex items-center glass-apple rounded-2xl px-3 py-1.5 gap-2 cursor-pointer hover:bg-white/80 transition-colors">
-          <Shield size={16} className="text-primary animate-blink shrink-0 md:w-4 md:h-4" />
-          <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest hidden md:inline shrink-0">Demo:</span>
-          <select
-            value={currentRole}
-            onChange={(e) => handleRoleChange(e.target.value as Role)}
-            className="bg-transparent text-xs md:text-sm font-semibold text-slate-900 focus:outline-none pr-5 md:pr-6 cursor-pointer appearance-none"
-          >
-            <option value="municipalidad">DIDECO (Muni)</option>
-            <option value="directiva">Junta de Vecinos</option>
-            <option value="vecino">Vecino Ciudadano</option>
-          </select>
-          <ChevronDown size={14} className="text-slate-400 absolute right-2 pointer-events-none" />
-        </div>
+        <SelectDropdown
+          value={currentRole}
+          onChange={(val) => handleRoleChange(val as Role)}
+          options={[
+            { value: 'municipalidad', label: 'DIDECO (Muni)' },
+            { value: 'directiva', label: 'Junta de Vecinos' },
+            { value: 'vecino', label: 'Vecino Ciudadano' }
+          ]}
+          className="flex items-center glass-apple rounded-2xl px-3 py-2 md:py-1.5 cursor-pointer hover:bg-white/80 transition-colors w-40 md:w-48"
+          icon={<Shield size={16} className="text-primary animate-blink md:w-4 md:h-4" />}
+          prefix="Demo:"
+        />
 
         {/* Notificaciones */}
         <button className="p-2 md:p-2.5 rounded-2xl hover:bg-slate-100 text-slate-500 relative transition-colors shrink-0">

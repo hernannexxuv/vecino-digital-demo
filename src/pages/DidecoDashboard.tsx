@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Target, Users, MapPin, CheckCircle2, CloudLightning, Activity, ChevronRight, FileText, BarChart3, Send, Megaphone, X } from 'lucide-react';
+import SelectDropdown from '../components/ui/SelectDropdown';
 
 const comunalMetrics = [
   { id: 1, label: 'Juntas de Vecinos Activas', value: '142', icon: Target, color: 'text-primary', bg: 'bg-primary-light' },
@@ -18,6 +19,11 @@ const recentActivity = [
 export default function DidecoDashboard() {
   // Estado para controlar la visibilidad del Modal de Comunicados
   const [showComunicadoModal, setShowComunicadoModal] = useState(false);
+  
+  // Estados para los selectores del Modal
+  const [alcance, setAlcance] = useState('toda_comuna');
+  const [urgencia, setUrgencia] = useState('informativo');
+  const [departamento, setDepartamento] = useState('social');
 
   return (
     <div className="flex flex-col gap-6 lg:h-full relative">
@@ -164,31 +170,49 @@ export default function DidecoDashboard() {
               
               <div>
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Alcance Territorial</label>
-                <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
-                  <option>Toda la Comuna de Temuco</option>
-                  <option>Solo Sector Amanecer</option>
-                  <option>Solo Sector Pedro de Valdivia</option>
-                  <option>Juntas de Vecinos Específicas...</option>
-                </select>
+                <SelectDropdown
+                  value={alcance}
+                  onChange={setAlcance}
+                  options={[
+                    { value: 'toda_comuna', label: 'Toda la Comuna de Temuco' },
+                    { value: 'sector_amanecer', label: 'Solo Sector Amanecer' },
+                    { value: 'sector_pedro', label: 'Solo Sector Pedro de Valdivia' },
+                    { value: 'especificas', label: 'Juntas de Vecinos Específicas...' }
+                  ]}
+                  className="w-full bg-white/70 backdrop-blur-md border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-white transition-all cursor-pointer shadow-sm"
+                  dropdownClassName="bg-white/90 backdrop-blur-xl"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Nivel de Urgencia</label>
-                  <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
-                    <option>Informativo (Estándar)</option>
-                    <option>Evento Comunitario</option>
-                    <option>Alerta Temprana (Urgente)</option>
-                  </select>
+                  <SelectDropdown
+                    value={urgencia}
+                    onChange={setUrgencia}
+                    options={[
+                      { value: 'informativo', label: 'Informativo (Estándar)' },
+                      { value: 'evento', label: 'Evento Comunitario' },
+                      { value: 'alerta', label: 'Alerta Temprana (Urgente)' }
+                    ]}
+                    className="w-full bg-white/70 backdrop-blur-md border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-white transition-all cursor-pointer shadow-sm"
+                    dropdownClassName="bg-white/90 backdrop-blur-xl"
+                  />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Departamento</label>
-                  <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
-                    <option>Dpto. Social</option>
-                    <option>Dpto. Deportes</option>
-                    <option>Desarrollo Económico</option>
-                    <option>Gabinete Alcaldía</option>
-                  </select>
+                  <SelectDropdown
+                    value={departamento}
+                    onChange={setDepartamento}
+                    options={[
+                      { value: 'social', label: 'Dpto. Social' },
+                      { value: 'deportes', label: 'Dpto. Deportes' },
+                      { value: 'desarrollo', label: 'Desarrollo Económico' },
+                      { value: 'alcaldia', label: 'Gabinete Alcaldía' }
+                    ]}
+                    className="w-full bg-white/70 backdrop-blur-md border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-white transition-all cursor-pointer shadow-sm"
+                    dropdownClassName="bg-white/90 backdrop-blur-xl"
+                  />
                 </div>
               </div>
 
