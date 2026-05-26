@@ -5,19 +5,7 @@ import BilleteraModule from './pages/BilleteraModule';
 import FirmaModule from './pages/FirmaModule';
 import DidecoDashboard from './pages/DidecoDashboard'; // Importamos la vista real
 import VecinoDashboard from './pages/VecinoDashboard';
-
-// ==========================================
-// PLACEHOLDERS TEMPORALES PARA LA DEMO
-// (Evitan errores de compilación mientras creamos las páginas)
-// ==========================================
-const MapaComunal = () => (
-  <div className="h-64 flex items-center justify-center bg-white rounded-2xl border-2 border-dashed border-gray-200 p-6 shadow-apple">
-    <div className="text-center">
-      <h2 className="text-xl font-bold text-gray-800 mb-2">Mapa Territorial Inteligente</h2>
-      <p className="text-sm text-gray-400">Visualización de Juntas de Vecinos activas en la comuna.</p>
-    </div>
-  </div>
-);
+import MapaComunal from './pages/MapaComunal';
 
 // ==========================================
 // ENRUTADOR PRINCIPAL
