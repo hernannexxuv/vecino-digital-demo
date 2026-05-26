@@ -20,7 +20,6 @@ interface SidebarProps {
 export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps) {
   const location = useLocation();
 
-  // Definición de menús según el rol que simules
   const menuItems = {
     superadmin: [
       { path: '/dideco', label: 'Consola Global', icon: ShieldCheck },
@@ -44,27 +43,27 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
 
   return (
     <aside className={`
-      bg-white border-r border-gray-200/80 h-full flex flex-col transition-all duration-300 ease-in-out z-30 shadow-apple
+      bg-white border-r border-slate-100 h-full flex flex-col transition-all duration-300 ease-in-out z-30 shadow-apple
       ${isOpen ? 'w-64' : 'w-0 -translate-x-full md:w-20 md:translate-x-0'}
     `}>
-      {/* Header del Sidebar */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100">
+      {/* Header del Sidebar - Usando el Gradiente Sutil de Temuco */}
+      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 bg-gradient-to-tr from-white to-primary-light/50">
         {isOpen ? (
-          <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            SmartCity Comuna
+          <span className="font-extrabold text-xl tracking-tighter text-slate-900">
+            SmartCity<span className="text-primary font-black">Temuco</span>
           </span>
         ) : (
-          <span className="font-black text-xl text-blue-600 mx-auto">SC</span>
+          <span className="font-black text-xl text-primary mx-auto">ST</span>
         )}
         <button 
           onClick={() => setIsOpen(!isOpen)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 md:hidden"
+          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 md:hidden"
         >
           <Menu size={20} />
         </button>
       </div>
 
-      {/* Menú de Navegación */}
+      {/* Menú de Navegación teñido de Primary (Azul Temuco) */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-hidden">
         {currentMenu.map((item) => {
           const Icon = item.icon;
@@ -74,23 +73,22 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
               key={item.path}
               to={item.path}
               className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200
+                flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all duration-150
                 ${isActive 
-                  ? 'bg-blue-50 text-blue-600 shadow-sm' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                  ? 'bg-primary text-white shadow-apple-md hover:bg-primary-dark' 
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}
               `}
             >
-              <Icon size={20} className={isActive ? 'text-blue-600' : 'text-gray-400'} />
+              <Icon size={20} className={isActive ? 'text-white' : 'text-slate-400'} />
               {isOpen && <span className="truncate">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer del Sidebar */}
-      <div className="p-3 border-t border-gray-100">
-        <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-          <Settings size={20} className="text-gray-400" />
+      <div className="p-3 border-t border-slate-100">
+        <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <Settings size={20} className="text-slate-400" />
           {isOpen && <span>Configuración</span>}
         </button>
       </div>
