@@ -6,6 +6,7 @@ import FirmaModule from './pages/FirmaModule';
 import DidecoDashboard from './pages/DidecoDashboard'; // Importamos la vista real
 import VecinoDashboard from './pages/VecinoDashboard';
 import MapaComunal from './pages/MapaComunal';
+import IncidenciasModule from './pages/IncidenciasModule';
 
 // ==========================================
 // ENRUTADOR PRINCIPAL
@@ -23,6 +24,7 @@ export default function App() {
           {/* Rutas de Rol: Municipalidad / DIDECO */}
           <Route path="/dideco" element={<DidecoDashboard />} />
           <Route path="/dideco/mapa" element={<MapaComunal />} />
+          <Route path="/reportes" element={<IncidenciasModule />} />
 
           {/* Rutas de Rol: Junta de Vecinos (Directiva) */}
           <Route path="/directiva/asamblea" element={<AsambleaModule />} />

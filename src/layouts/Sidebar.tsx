@@ -7,7 +7,9 @@ import {
   Map, 
   Settings, 
   Menu,
-  ShieldCheck
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle
 } from 'lucide-react';
 import type { Role } from '../data/mockData';
 
@@ -24,10 +26,12 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
     superadmin: [
       { path: '/dideco', label: 'Consola Global', icon: ShieldCheck },
       { path: '/dideco/mapa', label: 'Mapa Comunal', icon: Map },
+      { path: '/reportes', label: 'Gesti\u00f3n Ciudadana', icon: ShieldAlert },
     ],
     municipalidad: [
       { path: '/dideco', label: 'Panel DIDECO', icon: LayoutDashboard },
       { path: '/dideco/mapa', label: 'Mapa Smart City', icon: Map },
+      { path: '/reportes', label: 'Gesti\u00f3n Ciudadana', icon: ShieldAlert },
     ],
     directiva: [
       { path: '/directiva/asamblea', label: 'Asambleas', icon: Users },
@@ -36,6 +40,7 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
     ],
     vecino: [
       { path: '/inicio', label: 'Mi Barrio', icon: LayoutDashboard },
+      { path: '/reportes', label: 'Reportar Incidencia', icon: AlertTriangle },
     ]
   };
 
