@@ -31,7 +31,7 @@ export function Layout() {
   }, []);
 
   return (
-    <div className="flex h-screen w-screen bg-gray-50 overflow-hidden font-sans text-gray-900 antialiased relative">
+    <div className="flex h-[100dvh] w-screen bg-gray-50 overflow-hidden font-sans text-gray-900 antialiased relative">
       
       {/* OVERLAY: Capa oscura para móviles (solo visible si el menú está abierto) */}
       {isSidebarOpen && (
