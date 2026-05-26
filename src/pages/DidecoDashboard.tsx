@@ -38,13 +38,13 @@ export default function DidecoDashboard() {
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <button 
             onClick={() => setShowComunicadoModal(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-primary text-primary rounded-xl text-sm font-bold hover:bg-primary-light transition-colors shadow-sm"
+            className="btn-apple-secondary px-6 py-3 flex-1 sm:flex-none flex items-center justify-center gap-2"
           >
             <Megaphone size={18} />
             <span>Emitir Comunicado</span>
           </button>
           
-          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl text-sm font-bold hover:opacity-90 transition-opacity shadow-apple-md">
+          <button className="btn-apple-primary px-6 py-3 flex-1 sm:flex-none flex items-center justify-center gap-2">
             <BarChart3 size={18} />
             <span>Generar Reporte</span>
           </button>
@@ -56,7 +56,7 @@ export default function DidecoDashboard() {
         {comunalMetrics.map((metric) => {
           const Icon = metric.icon;
           return (
-            <div key={metric.id} className="bg-white rounded-3xl border border-slate-100 shadow-apple p-5 flex items-start gap-4 hover:shadow-apple-md transition-shadow">
+            <div key={metric.id} className="card-apple p-6 flex items-start gap-4">
               <div className={`w-12 h-12 rounded-2xl ${metric.bg} flex items-center justify-center shrink-0`}>
                 <Icon className={`w-6 h-6 ${metric.color}`} />
               </div>

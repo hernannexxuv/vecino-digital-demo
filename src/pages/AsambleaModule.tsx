@@ -79,7 +79,7 @@ export default function AsambleaModule() {
 
         {/* Bloques del Editor */}
         <div className="flex-1 space-y-4 overflow-auto scrollbar-hidden">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-apple p-5">
+          <div className="card-apple p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-7 h-7 rounded-xl bg-blue-50 flex items-center justify-center"><FileText className="w-3.5 h-3.5 text-blue-600" /></div>
               <h3 className="text-sm font-semibold text-gray-900">Temas</h3>
@@ -95,7 +95,7 @@ export default function AsambleaModule() {
             </div>
           </div>
           
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-apple p-5">
+          <div className="card-apple p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-7 h-7 rounded-xl bg-green-50 flex items-center justify-center"><CheckSquare className="w-3.5 h-3.5 text-green-600" /></div>
               <h3 className="text-sm font-semibold text-gray-900">Acuerdos</h3>
@@ -112,7 +112,7 @@ export default function AsambleaModule() {
 
       {/* Sidebar - Agenda */}
       <div className="w-full lg:w-80 shrink-0">
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-apple p-5 lg:sticky lg:top-0">
+        <div className="card-apple p-6 lg:sticky lg:top-0">
           <div className="flex items-center gap-2 mb-5">
             <div className="w-7 h-7 rounded-xl bg-gray-900 flex items-center justify-center"><Clock className="w-3.5 h-3.5 text-white" /></div>
             <h3 className="text-sm font-semibold text-gray-900">Agenda</h3>

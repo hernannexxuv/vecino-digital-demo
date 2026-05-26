@@ -19,7 +19,7 @@ export default function FirmaModule() {
   const totalCount = attendees.length;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-0 overflow-hidden rounded-2xl border border-slate-200 shadow-apple lg:h-full">
+    <div className="card-apple p-0 flex flex-col lg:flex-row gap-0 overflow-hidden lg:h-full">
       {/* Left Side - Vista Secretario */}
       <div className="flex-1 bg-white border-r border-slate-200 flex flex-col min-w-0 overflow-hidden">
         <div className="p-6 border-b border-slate-100">
@@ -92,7 +92,7 @@ export default function FirmaModule() {
                 <p className="text-sm font-semibold text-green-700">Acta firmada digitalmente</p>
               </div>
             ) : (
-              <button onClick={() => setHasSigned(true)} className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-base font-semibold bg-gray-900 text-white hover:bg-gray-800 shadow-apple-lg transition-all active:scale-[0.97]">
+              <button onClick={() => setHasSigned(true)} className="btn-apple-primary w-full flex items-center justify-center gap-3 py-4 text-lg">
                 <PenTool className="w-5 h-5" /> Firmar Acta
               </button>
             )}
