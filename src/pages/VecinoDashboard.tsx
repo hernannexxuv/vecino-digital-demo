@@ -64,7 +64,11 @@ export default function VecinoDashboard() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => startProcess(position.coords.latitude, position.coords.longitude),
-        () => startProcess(-38.73965, -72.59842)
+        (error) => {
+          console.warn("GPS denegado o no disponible:", error);
+          startProcess(-38.73965, -72.59842); // Fallback Temuco
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     } else {
       startProcess(-38.73965, -72.59842);
