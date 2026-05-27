@@ -90,7 +90,7 @@ export default function VecinoDashboard() {
   };
 
   return (
-    <div className="h-full flex flex-col gap-6 relative">
+    <div className="h-auto lg:h-full flex flex-col gap-6 relative">
       
       {/* ========================================== */}
       {/* BOTÓN PARA SIMULAR EL ENVÍO DESDE DIRECTIVA */}
@@ -154,7 +154,7 @@ export default function VecinoDashboard() {
         </div>
 
         {/* Columna Derecha: Muro Vecinal */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-apple flex flex-col overflow-hidden">
+        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-apple flex flex-col overflow-hidden min-h-[500px] lg:min-h-0">
           <div className="p-6 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-lg font-bold text-slate-900">Muro Vecinal Temuco</h3>
             <button className="text-xs font-bold text-primary hover:text-primary-dark transition-colors">Ver todo</button>
