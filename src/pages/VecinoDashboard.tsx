@@ -18,13 +18,12 @@ export default function VecinoDashboard() {
   const [gpsStatus, setGpsStatus] = useState<'pending' | 'locating' | 'verifying' | 'dropping' | 'success'>('pending');
   const [coords, setCoords] = useState<{lat: number, lon: number} | null>(null);
 
-  // Simulación del temporizador
+  // Temporizador real: corre desde que se carga la página, independiente del paso
   useEffect(() => {
-    if (voteStep === 'voting' && timeLeft > 0) {
-      const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-      return () => clearInterval(timer);
-    }
-  }, [voteStep, timeLeft]);
+    if (timeLeft <= 0) return;
+    const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
