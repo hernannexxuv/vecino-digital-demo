@@ -40,11 +40,13 @@ export default function VecinoDashboard() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [gpsStatus, setGpsStatus] = useState<'pending' | 'locating' | 'verifying' | 'dropping' | 'success'>('pending');
+  const [gpsError, setGpsError] = useState<string | null>(null);
   const [coords, setCoords] = useState<{lat: number, lon: number} | null>(null);
 
   // Simulación de captura GPS
   const handleGpsAuth = (e: React.FormEvent) => {
     e.preventDefault();
+    setGpsError(null);
     setGpsStatus('locating');
     
     const startProcess = (lat: number, lon: number) => {
@@ -66,12 +68,20 @@ export default function VecinoDashboard() {
         (position) => startProcess(position.coords.latitude, position.coords.longitude),
         (error) => {
           console.warn("GPS denegado o no disponible:", error);
-          startProcess(-38.73965, -72.59842); // Fallback Temuco
+          setGpsStatus('pending');
+          if (error.code === error.PERMISSION_DENIED) {
+            setGpsError('Permiso denegado. Debes autorizar el uso de tu ubicación para votar.');
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            setGpsError('GPS no disponible. Enciende la ubicación de tu dispositivo.');
+          } else {
+            setGpsError('Error al obtener la ubicación. Intenta nuevamente.');
+          }
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     } else {
-      startProcess(-38.73965, -72.59842);
+      setGpsStatus('pending');
+      setGpsError('Tu navegador no soporta geolocalización.');
     }
   };
 
@@ -340,6 +350,16 @@ export default function VecinoDashboard() {
                           <p className="text-xs text-secondary/80 mt-1">La plataforma verificará que te encuentras dentro del radio del barrio Amanecer.</p>
                         </div>
                       </div>
+
+                      {gpsError && (
+                        <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-start gap-3 animate-in shake">
+                          <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={18} />
+                          <div>
+                            <p className="text-sm font-bold text-red-800">Ubicación Requerida</p>
+                            <p className="text-xs text-red-600 mt-1">{gpsError}</p>
+                          </div>
+                        </div>
+                      )}
 
                       <button 
                         type="submit" 
