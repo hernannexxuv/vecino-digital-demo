@@ -59,12 +59,18 @@ function LeafletMap({ coords }: { coords: { lat: number, lon: number } }) {
 
     L.marker([coords.lat, coords.lon], { icon: customIcon }).addTo(map);
 
+    // Forzamos recalcular tamaño después de que la animación de React termine
+    const timeout = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+
     return () => {
+      clearTimeout(timeout);
       map.remove(); // Limpieza para evitar errores de react re-mount
     };
   }, [coords]);
 
-  return <div ref={mapRef} className="w-full h-full z-0" />;
+  return <div ref={mapRef} className="absolute inset-0 z-0" style={{ filter: 'opacity(0.8) grayscale(0.2)' }} />;
 }
 
 const avisosBarrio = [
