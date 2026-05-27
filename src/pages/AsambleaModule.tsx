@@ -1,137 +1,224 @@
-import { useState } from 'react';
-import { Cloud, Clock, History, FileText, CheckSquare, ToggleLeft, ToggleRight, GripVertical } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { 
+  Users, CheckCircle2, Clock, Play, StopCircle, 
+  BarChart3, Megaphone, AlertCircle,
+  ChevronRight
+} from 'lucide-react';
 
-interface AgendaItem { id: number; title: string; timeEstimate: string; checked: boolean; }
-
-const INITIAL_AGENDA: AgendaItem[] = [
-  { id: 1, title: 'Lectura del acta anterior', timeEstimate: '10', checked: false },
-  { id: 2, title: 'Informe de Tesorería', timeEstimate: '15', checked: false },
-  { id: 3, title: 'Moción: Reparación fachada', timeEstimate: '20', checked: false },
-  { id: 4, title: 'Votación cuota extraordinaria', timeEstimate: '10', checked: false },
-  { id: 5, title: 'Asuntos varios', timeEstimate: '15', checked: false },
-];
+type VoteStatus = 'setup' | 'active' | 'results';
 
 export default function AsambleaModule() {
-  const [agenda, setAgenda] = useState<AgendaItem[]>(INITIAL_AGENDA);
-  const [isTransmitting, setIsTransmitting] = useState(false);
-  const [globalTimer, setGlobalTimer] = useState<string | null>(null);
+  const [status, setStatus] = useState<VoteStatus>('setup');
+  const [quorumReq, setQuorumReq] = useState(50);
+  const [timerSet, setTimerSet] = useState(15);
+  const [votosRealizados, setVotosRealizados] = useState(0);
+  const totalSocios = 142;
 
-  const activeItems = agenda.filter((i) => i.checked);
-  const totalMinutes = activeItems.reduce((sum, i) => sum + parseInt(i.timeEstimate || '0'), 0);
+  // Simulación de vecinos votando en tiempo real
+  useEffect(() => {
+    if (status === 'active' && votosRealizados < 85) {
+      const interval = setInterval(() => {
+        setVotosRealizados(prev => prev + Math.floor(Math.random() * 3));
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [status, votosRealizados]);
 
-  const handleCheck = (id: number) => {
-    setAgenda((prev) => prev.map((item) => item.id === id ? { ...item, checked: !item.checked } : item));
-    const newlyChecked = agenda.find((i) => i.id === id);
-    if (newlyChecked && !newlyChecked.checked) setGlobalTimer(newlyChecked.timeEstimate + ':00');
-  };
-
-  const updateTime = (id: number, val: string) => {
-    setAgenda((prev) => prev.map((i) => (i.id === id ? { ...i, timeEstimate: val } : i)));
-  };
+  const porcentajeActual = Math.round((votosRealizados / totalSocios) * 100);
+  const quorumAlcanzado = porcentajeActual >= quorumReq;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 lg:h-full">
-      {/* Main Content - Acta en Vivo */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Acta en Vivo</h2>
-              <div className="flex items-center gap-2 mt-0.5">
-                <Cloud className="w-3.5 h-3.5 text-green-500" />
-                <span className="text-xs text-green-600 font-medium">Autoguardado en la Nube</span>
-                <span className="text-xs text-slate-300 mx-1">|</span>
-                <span className="text-xs text-gray-400">hace 2 min</span>
-              </div>
-            </div>
+    <div className="h-full flex flex-col gap-6">
+      
+      {/* Header del Módulo */}
+      <div className="card-apple p-6 flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-primary-light flex items-center justify-center text-primary shadow-sm">
+            <Users size={24} />
           </div>
-          <div className="flex items-center gap-3">
-            {globalTimer && (
-              <div className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-2xl shadow-apple-md">
-                <Clock className="w-4 h-4 text-green-400" />
-                <span className="font-mono text-sm font-semibold tracking-wider">{globalTimer}</span>
-              </div>
-            )}
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-2xl text-sm font-medium text-gray-700 hover:bg-slate-50 transition-all shadow-apple">
-              <History className="w-4 h-4" /> Historial
-            </button>
+          <div>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">Gestión de Asambleas In Situ</h2>
+            <p className="text-sm text-slate-500 font-medium">Control de quórum y votaciones vinculantes.</p>
           </div>
         </div>
-
-        {/* Toggle Transmitir */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-apple p-5 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Transmitir Acta en Vivo</p>
-              <p className="text-xs text-gray-400 mt-0.5">Los vecinos verán el acta actualizándose en tiempo real</p>
-            </div>
-            <button onClick={() => setIsTransmitting(!isTransmitting)} className="flex items-center gap-3 group cursor-pointer">
-              {isTransmitting ? <ToggleRight className="w-12 h-8 text-green-500 transition-all" /> : <ToggleLeft className="w-12 h-8 text-slate-300 transition-all" />}
-              <span className={`text-xs font-semibold ${isTransmitting ? 'text-green-600' : 'text-gray-400'}`}>
-                {isTransmitting ? 'EN VIVO' : 'OFF'}
-              </span>
-            </button>
-          </div>
+        <div className="flex items-center gap-3">
+           <div className="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold text-slate-500">
+             Sede: Amanecer (Zona GPS Habilitada)
+           </div>
         </div>
+      </div>
 
-        {/* Bloques del Editor */}
-        <div className="flex-1 space-y-4 overflow-auto scrollbar-hidden">
-          <div className="card-apple p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded-xl bg-blue-50 flex items-center justify-center"><FileText className="w-3.5 h-3.5 text-blue-600" /></div>
-              <h3 className="text-sm font-semibold text-gray-900">Temas</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
-                <GripVertical className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-800 font-medium">Reparación de fachada del edificio principal</p>
-                  <p className="text-xs text-gray-400 mt-1">Presentado por: Juan Martinez | Prioridad: Alta</p>
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+        
+        {/* PANEL IZQUIERDO: CONFIGURACIÓN Y ESTADO */}
+        <div className="lg:col-span-1 space-y-6">
+          
+          {/* 1. CONFIGURACIÓN (VISTA SETUP) */}
+          {status === 'setup' && (
+            <div className="card-apple p-6 space-y-6 animate-in slide-in-from-left-4">
+              <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                <Play size={18} className="text-primary" /> Nueva Votación
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Tiempo de Votación</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[15, 30, 45, 60].map(m => (
+                      <button 
+                        key={m}
+                        onClick={() => setTimerSet(m)}
+                        className={`py-2 rounded-xl text-xs font-bold border transition-all ${timerSet === m ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-slate-500 border-slate-100 hover:border-slate-300'}`}
+                      >
+                        {m}'
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Quórum Requerido (%)</label>
+                  <input 
+                    type="range" min="10" max="100" value={quorumReq}
+                    onChange={(e) => setQuorumReq(parseInt(e.target.value))}
+                    className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-primary"
+                  />
+                  <div className="flex justify-between mt-2 text-xs font-bold text-primary">
+                    <span>Mínimo: 10%</span>
+                    <span>Objetivo: {quorumReq}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setStatus('active')}
+                className="w-full btn-apple-primary py-4 flex items-center justify-center gap-2"
+              >
+                Lanzar a Celulares de Socios <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
+
+          {/* 2. PANEL ACTIVO (MONITOREO) */}
+          {status === 'active' && (
+            <div className="card-apple p-6 space-y-6 animate-in zoom-in-95">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-black text-slate-900">Votación en Curso</h3>
+                  <p className="text-xs text-slate-500">Los vecinos están votando in situ.</p>
+                </div>
+                <div className="bg-red-50 text-red-500 px-3 py-1 rounded-full text-[10px] font-bold animate-pulse border border-red-100 uppercase">En Vivo</div>
+              </div>
+
+              {/* Barra de Quórum Animada */}
+              <div className="space-y-3">
+                <div className="flex justify-between text-xs font-bold">
+                  <span className="text-slate-400 uppercase tracking-tighter">Progreso de Quórum</span>
+                  <span className={quorumAlcanzado ? 'text-secondary' : 'text-primary'}>{porcentajeActual}% / {quorumReq}%</span>
+                </div>
+                <div className="h-4 bg-slate-100 rounded-full overflow-hidden border border-slate-200 p-0.5">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-1000 ${quorumAlcanzado ? 'bg-secondary' : 'bg-primary'}`}
+                    style={{ width: `${porcentajeActual}%` }}
+                  />
+                </div>
+                {!quorumAlcanzado && (
+                  <p className="text-[10px] text-amber-600 font-bold flex items-center gap-1 bg-amber-50 p-2 rounded-lg">
+                    <AlertCircle size={12} /> Falta quórum para validez legal.
+                  </p>
+                )}
+              </div>
+
+              <button 
+                onClick={() => setStatus('results')}
+                className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-black transition-all shadow-apple-lg"
+              >
+                <StopCircle size={18} /> Finalizar y Ver Resultados
+              </button>
+            </div>
+          )}
+
+          {/* 3. RESULTADOS FINALES */}
+          {status === 'results' && (
+            <div className="card-apple p-6 space-y-6 animate-in slide-in-from-bottom-4">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-secondary-light rounded-full flex items-center justify-center mx-auto mb-3">
+                  <BarChart3 className="text-secondary" />
+                </div>
+                <h3 className="font-black text-slate-900">Resultados Cerrados</h3>
+                <p className="text-xs text-slate-500">Votación validada por GPS.</p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                  <span className="text-sm font-bold text-slate-700">Apruebo</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-secondary" style={{ width: '75%' }} />
+                    </div>
+                    <span className="text-sm font-black text-slate-900">75%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                  <span className="text-sm font-bold text-slate-700">Rechazo</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-accent" style={{ width: '20%' }} />
+                    </div>
+                    <span className="text-sm font-black text-slate-900">20%</span>
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                className="w-full btn-apple-secondary py-3 flex items-center justify-center gap-2"
+                onClick={() => setStatus('setup')}
+              >
+                <Megaphone size={16} /> Notificar a todos los Socios
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* PANEL DERECHO: LISTADO DE SOCIOS (TRANSPARENCIA) */}
+        <div className="lg:col-span-2 card-apple flex flex-col overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <h3 className="text-sm font-bold text-slate-800">Padrón Electoral In Situ ({totalSocios} socios)</h3>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-1 text-[10px] font-bold text-secondary">
+                <CheckCircle2 size={12} /> YA VOTÓ
+              </div>
+              <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
+                <Clock size={12} /> PENDIENTE
               </div>
             </div>
           </div>
           
-          <div className="card-apple p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded-xl bg-green-50 flex items-center justify-center"><CheckSquare className="w-3.5 h-3.5 text-green-600" /></div>
-              <h3 className="text-sm font-semibold text-gray-900">Acuerdos</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 bg-green-50/50 rounded-xl border border-green-100">
-                <CheckSquare className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                <p className="text-sm text-gray-800 font-medium">Se aprueba presupuesto de $2.500.000 para reparación de fachada</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sidebar - Agenda */}
-      <div className="w-full lg:w-80 shrink-0">
-        <div className="card-apple p-6 lg:sticky lg:top-0">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-7 h-7 rounded-xl bg-gray-900 flex items-center justify-center"><Clock className="w-3.5 h-3.5 text-white" /></div>
-            <h3 className="text-sm font-semibold text-gray-900">Agenda</h3>
-            <span className="ml-auto text-xs text-gray-400 bg-slate-50 px-2 py-0.5 rounded-lg">{totalMinutes} min total</span>
-          </div>
-          <div className="space-y-2">
-            {agenda.map((item, idx) => (
-              <div key={item.id} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${item.checked ? 'bg-green-50 border border-green-100' : 'bg-slate-50 border border-transparent'}`}>
-                <span className="text-xs font-mono text-gray-400 w-5 shrink-0">{String(idx + 1).padStart(2, '0')}</span>
-                <input type="checkbox" checked={item.checked} onChange={() => handleCheck(item.id)} className="w-4 h-4 rounded-md border-gray-300 text-green-500 focus:ring-green-500 cursor-pointer" />
-                <p className={`flex-1 min-w-0 text-sm font-medium truncate ${item.checked ? 'text-green-700 line-through' : 'text-gray-800'}`}>{item.title}</p>
-                <div className="flex items-center gap-1 shrink-0">
-                  <input type="number" value={item.timeEstimate} onChange={(e) => updateTime(item.id, e.target.value)} className="w-12 text-center text-xs bg-white border border-slate-200 rounded-lg py-1 px-1 focus:outline-none" min={1} />
-                  <span className="text-[10px] text-gray-400">min</span>
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Generamos una lista simulada de socios */}
+              {[...Array(16)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-2xl border border-slate-50 bg-white">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase">
+                      S{i+1}
+                    </div>
+                    <p className="text-xs font-bold text-slate-700">Socio Correlativo N°{100 + i}</p>
+                  </div>
+                  {i < (votosRealizados / 5) ? (
+                    <CheckCircle2 size={18} className="text-secondary" />
+                  ) : (
+                    <Clock size={18} className="text-slate-200" />
+                  )}
                 </div>
+              ))}
+              <div className="col-span-full py-4 text-center">
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">... y 126 socios más registrados ...</p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   );
