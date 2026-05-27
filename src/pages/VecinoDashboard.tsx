@@ -72,9 +72,9 @@ export default function VecinoDashboard() {
           console.warn("GPS denegado o no disponible:", error);
           setGpsStatus('pending');
           if (error.code === error.PERMISSION_DENIED) {
-            setGpsError('Permiso denegado. Debes autorizar el uso de tu ubicación para votar.');
+            setGpsError('Acceso bloqueado por el navegador. Ve a la Configuración de tu celular y otorga el permiso de ubicación a Chrome/Safari para este sitio.');
           } else if (error.code === error.POSITION_UNAVAILABLE) {
-            setGpsError('Señal de ubicación muy débil. Revisa que el GPS esté encendido.');
+            setGpsError('Señal de ubicación no disponible. Revisa que el GPS de tu celular esté encendido.');
           } else if (error.code === error.TIMEOUT) {
             setGpsError('Tiempo de espera agotado buscando tu ubicación. Intenta de nuevo.');
           } else {
