@@ -64,6 +64,8 @@ export default function VecinoDashboard() {
     };
 
     if (navigator.geolocation) {
+      // Usamos enableHighAccuracy: false para evitar fallos de señal satelital en interiores (celulares).
+      // Esto de igual forma forzará al navegador a pedir el permiso al usuario.
       navigator.geolocation.getCurrentPosition(
         (position) => startProcess(position.coords.latitude, position.coords.longitude),
         (error) => {
@@ -72,12 +74,14 @@ export default function VecinoDashboard() {
           if (error.code === error.PERMISSION_DENIED) {
             setGpsError('Permiso denegado. Debes autorizar el uso de tu ubicación para votar.');
           } else if (error.code === error.POSITION_UNAVAILABLE) {
-            setGpsError('GPS no disponible. Enciende la ubicación de tu dispositivo.');
+            setGpsError('Señal de ubicación muy débil. Revisa que el GPS esté encendido.');
+          } else if (error.code === error.TIMEOUT) {
+            setGpsError('Tiempo de espera agotado buscando tu ubicación. Intenta de nuevo.');
           } else {
             setGpsError('Error al obtener la ubicación. Intenta nuevamente.');
           }
         },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
       );
     } else {
       setGpsStatus('pending');
