@@ -1,6 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Megaphone, AlertTriangle, QrCode, ArrowRight, ShieldCheck, MapPin, Clock, Lock, CheckCircle2, X, Archive, Mail } from 'lucide-react';
 
+// Variable global para que todos los cronómetros estén 100% sincronizados
+// y cuenten desde el momento en que se carga la página (el script).
+const GLOBAL_END_TIME = Date.now() + 15 * 60 * 1000;
+
+// Componente Timer Aislado: Maneja su propio estado para evitar bloqueos por re-renders del padre
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = useState(() => Math.max(0, Math.floor((GLOBAL_END_TIME - Date.now()) / 1000)));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = Date.now();
+      const remaining = Math.max(0, Math.floor((GLOBAL_END_TIME - now) / 1000));
+      setTimeLeft(remaining);
+      if (remaining <= 0) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  const formatted = `${m}:${s.toString().padStart(2, '0')}`;
+
+  return <>{formatted}</>;
+}
+
 const avisosBarrio = [
   { id: 1, type: 'urgente', title: 'Corte de agua programado', date: 'Mañana, 15:00 hrs', desc: 'Aguas Araucanía informa corte por matriz en Sector Sur.', icon: AlertTriangle, color: 'text-accent', bg: 'bg-accent-light' },
   { id: 2, type: 'comunidad', title: 'Asamblea Ordinaria', date: 'Viernes, 19:30 hrs', desc: 'Se votará el presupuesto de fachada. Tu asistencia es vital.', icon: Megaphone, color: 'text-primary', bg: 'bg-primary-light' },
@@ -13,35 +38,9 @@ type VoteStep = 'idle' | 'alert' | 'voting' | 'confirm' | 'security' | 'success'
 export default function VecinoDashboard() {
   const [voteStep, setVoteStep] = useState<VoteStep>('idle');
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutos en segundos
   const [password, setPassword] = useState('');
   const [gpsStatus, setGpsStatus] = useState<'pending' | 'locating' | 'verifying' | 'dropping' | 'success'>('pending');
   const [coords, setCoords] = useState<{lat: number, lon: number} | null>(null);
-
-  // Temporizador resistente a estrangulamiento de pestañas del navegador
-  useEffect(() => {
-    // Calculamos el momento exacto en que deben expirar los 15 minutos
-    const endTime = Date.now() + 15 * 60 * 1000;
-    
-    const timer = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
-      
-      setTimeLeft(remaining);
-      
-      if (remaining <= 0) {
-        clearInterval(timer);
-      }
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
 
   // Simulación de captura GPS
   const handleGpsAuth = (e: React.FormEvent) => {
@@ -84,7 +83,7 @@ export default function VecinoDashboard() {
           {/* Cronometro siempre visible para la demo */}
           <div className="flex items-center gap-1.5 bg-white text-slate-700 px-2 py-1 rounded font-mono font-bold border border-slate-300">
             <Clock size={14} />
-            {formatTime(timeLeft)}
+            <CountdownTimer />
           </div>
         </div>
         <button onClick={() => setVoteStep('alert')} className="bg-white border border-slate-300 px-3 py-1 rounded-lg hover:bg-slate-50 font-bold text-slate-700">
@@ -242,7 +241,7 @@ export default function VecinoDashboard() {
 
                   {/* Temporizador */}
                   <div className="flex items-center justify-center gap-2 bg-accent-light text-accent py-2 px-4 rounded-xl font-mono font-bold text-lg border border-accent/20">
-                    <Clock size={18} /> {formatTime(timeLeft)}
+                    <Clock size={18} /> <CountdownTimer />
                   </div>
 
                   {/* Opciones */}
