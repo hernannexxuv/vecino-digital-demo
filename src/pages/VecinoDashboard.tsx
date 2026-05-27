@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, FileText, Megaphone, AlertTriangle, QrCode, ArrowRight, ShieldCheck, MapPin, Clock, Lock, CheckCircle2, X, Archive, Mail } from 'lucide-react';
+import { Megaphone, AlertTriangle, QrCode, ArrowRight, ShieldCheck, MapPin, Clock, Lock, CheckCircle2, X, Archive, Mail } from 'lucide-react';
 
 const avisosBarrio = [
   { id: 1, type: 'urgente', title: 'Corte de agua programado', date: 'Mañana, 15:00 hrs', desc: 'Aguas Araucanía informa corte por matriz en Sector Sur.', icon: AlertTriangle, color: 'text-accent', bg: 'bg-accent-light' },
