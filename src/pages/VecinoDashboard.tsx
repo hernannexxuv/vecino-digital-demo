@@ -80,7 +80,7 @@ export default function VecinoDashboard() {
         </button>
       </div>
 
-      {/* Header Saludo y resto del Dashboard... (Mantenido igual) */}
+      {/* Header Saludo con cronometro siempre visible y badge de verificacion */}
       <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-apple flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">Hola, Hernán</h2>
@@ -89,9 +89,16 @@ export default function VecinoDashboard() {
             Junta de Vecinos Amanecer, Temuco
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 bg-secondary-light text-secondary px-4 py-2.5 rounded-xl text-sm font-bold border border-secondary/20 shadow-sm">
-          <ShieldCheck size={18} />
-          Vecino Verificado
+        <div className="flex items-center gap-3">
+          {/* Cronometro siempre visible - independiente del modal */}
+          <div className="flex items-center gap-2 bg-accent-light text-accent px-3 py-2.5 rounded-xl font-mono font-bold text-base border border-accent/20 shadow-sm">
+            <Clock size={16} />
+            {formatTime(timeLeft)}
+          </div>
+          <div className="hidden sm:flex items-center gap-2 bg-secondary-light text-secondary px-4 py-2.5 rounded-xl text-sm font-bold border border-secondary/20 shadow-sm">
+            <ShieldCheck size={18} />
+            Vecino Verificado
+          </div>
         </div>
       </div>
 
