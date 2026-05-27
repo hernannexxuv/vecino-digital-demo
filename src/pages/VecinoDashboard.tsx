@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Megaphone, AlertTriangle, QrCode, ArrowRight, ShieldCheck, MapPin, Clock, Lock, CheckCircle2, X, Archive, Mail } from 'lucide-react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 // Variable global para que todos los cronómetros estén 100% sincronizados
 // y cuenten desde el momento en que se carga la página (el script).
@@ -24,6 +26,45 @@ function CountdownTimer() {
   const formatted = `${m}:${s.toString().padStart(2, '0')}`;
 
   return <>{formatted}</>;
+}
+
+// Mapa Leaflet Elegante con CartoDB Positron
+function LeafletMap({ coords }: { coords: { lat: number, lon: number } }) {
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Inicializamos el mapa sin controles intrusivos para mantener limpieza
+    const map = L.map(mapRef.current, {
+      center: [coords.lat, coords.lon],
+      zoom: 16,
+      zoomControl: false,
+      attributionControl: false,
+      dragging: true // Permitimos navegar el mapa
+    });
+
+    // CartoDB Positron (mapa minimalista, elegante, ideal para dashboards)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    // Marcador personalizado "Glassmorphic / Moderno" usando divIcon
+    const customIcon = L.divIcon({
+      className: 'bg-transparent',
+      html: '<div class="w-6 h-6 bg-secondary rounded-full border-4 border-white shadow-[0_0_15px_rgba(34,197,94,0.5)] animate-pulse"></div>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+
+    L.marker([coords.lat, coords.lon], { icon: customIcon }).addTo(map);
+
+    return () => {
+      map.remove(); // Limpieza para evitar errores de react re-mount
+    };
+  }, [coords]);
+
+  return <div ref={mapRef} className="w-full h-full z-0" />;
 }
 
 const avisosBarrio = [
@@ -379,16 +420,7 @@ export default function VecinoDashboard() {
                         {coords ? (
                           <>
                             <div className="absolute inset-0 bg-slate-900/10 pointer-events-none z-10" />
-                            <iframe 
-                              width="100%" 
-                              height="100%" 
-                              frameBorder="0" 
-                              scrolling="no" 
-                              marginHeight={0} 
-                              marginWidth={0} 
-                              src={`https://www.openstreetmap.org/export/embed.html?bbox=${coords.lon-0.005},${coords.lat-0.005},${coords.lon+0.005},${coords.lat+0.005}&layer=mapnik&marker=${coords.lat},${coords.lon}`}
-                              className="opacity-70 grayscale"
-                            ></iframe>
+                            <LeafletMap coords={coords} />
                             
                             {/* Animación sobre el mapa */}
                             <div className="absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[2px]">
