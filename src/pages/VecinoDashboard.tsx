@@ -18,17 +18,22 @@ export default function VecinoDashboard() {
   const [gpsStatus, setGpsStatus] = useState<'pending' | 'locating' | 'verifying' | 'dropping' | 'success'>('pending');
   const [coords, setCoords] = useState<{lat: number, lon: number} | null>(null);
 
-  // Temporizador real: un solo intervalo al montar el componente, sin dependencias externas
+  // Temporizador resistente a estrangulamiento de pestañas del navegador
   useEffect(() => {
+    // Calculamos el momento exacto en que deben expirar los 15 minutos
+    const endTime = Date.now() + 15 * 60 * 1000;
+    
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
+      const now = Date.now();
+      const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
+      
+      setTimeLeft(remaining);
+      
+      if (remaining <= 0) {
+        clearInterval(timer);
+      }
     }, 1000);
+    
     return () => clearInterval(timer);
   }, []);
 
@@ -74,13 +79,20 @@ export default function VecinoDashboard() {
       {/* BOTÓN PARA SIMULAR EL ENVÍO DESDE DIRECTIVA */}
       {/* ========================================== */}
       <div className="bg-slate-100 p-2 rounded-xl border border-slate-200 flex justify-between items-center text-xs text-slate-500 mb-2">
-        <span>Simulador de Demo:</span>
+        <div className="flex items-center gap-3">
+          <span>Simulador de Demo:</span>
+          {/* Cronometro siempre visible para la demo */}
+          <div className="flex items-center gap-1.5 bg-white text-slate-700 px-2 py-1 rounded font-mono font-bold border border-slate-300">
+            <Clock size={14} />
+            {formatTime(timeLeft)}
+          </div>
+        </div>
         <button onClick={() => setVoteStep('alert')} className="bg-white border border-slate-300 px-3 py-1 rounded-lg hover:bg-slate-50 font-bold text-slate-700">
           Simular Alerta de Votación
         </button>
       </div>
 
-      {/* Header Saludo con cronometro siempre visible y badge de verificacion */}
+      {/* Header Saludo y resto del Dashboard... (Mantenido igual) */}
       <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-apple flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">Hola, Hernán</h2>
@@ -89,16 +101,9 @@ export default function VecinoDashboard() {
             Junta de Vecinos Amanecer, Temuco
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Cronometro siempre visible - independiente del modal */}
-          <div className="flex items-center gap-2 bg-accent-light text-accent px-3 py-2.5 rounded-xl font-mono font-bold text-base border border-accent/20 shadow-sm">
-            <Clock size={16} />
-            {formatTime(timeLeft)}
-          </div>
-          <div className="hidden sm:flex items-center gap-2 bg-secondary-light text-secondary px-4 py-2.5 rounded-xl text-sm font-bold border border-secondary/20 shadow-sm">
-            <ShieldCheck size={18} />
-            Vecino Verificado
-          </div>
+        <div className="hidden sm:flex items-center gap-2 bg-secondary-light text-secondary px-4 py-2.5 rounded-xl text-sm font-bold border border-secondary/20 shadow-sm">
+          <ShieldCheck size={18} />
+          Vecino Verificado
         </div>
       </div>
 
