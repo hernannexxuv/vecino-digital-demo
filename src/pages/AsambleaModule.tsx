@@ -197,21 +197,28 @@ export default function AsambleaModule() {
           <div className="flex-1 overflow-y-auto p-4 scrollbar-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* Generamos una lista simulada de socios */}
-              {[...Array(16)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-2xl border border-slate-50 bg-white">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase">
-                      S{i+1}
+              {[...Array(16)].map((_, i) => {
+                // Secuencia pseudoaleatoria fija para evitar parpadeos al actualizar el estado
+                const ordenVoto = [7, 2, 14, 5, 11, 0, 9, 15, 3, 12, 8, 1, 10, 6, 13, 4];
+                // Calculamos si este socio ya votó basado en el progreso global
+                const yaVoto = ordenVoto[i] < (votosRealizados / totalSocios) * 16;
+                
+                return (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-2xl border border-slate-50 bg-white">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase">
+                        S{i+1}
+                      </div>
+                      <p className="text-xs font-bold text-slate-700">Socio Correlativo N°{100 + i}</p>
                     </div>
-                    <p className="text-xs font-bold text-slate-700">Socio Correlativo N°{100 + i}</p>
+                    {yaVoto ? (
+                      <CheckCircle2 size={18} className="text-secondary" />
+                    ) : (
+                      <Clock size={18} className="text-slate-200" />
+                    )}
                   </div>
-                  {i < (votosRealizados / 5) ? (
-                    <CheckCircle2 size={18} className="text-secondary" />
-                  ) : (
-                    <Clock size={18} className="text-slate-200" />
-                  )}
-                </div>
-              ))}
+                );
+              })}
               <div className="col-span-full py-4 text-center">
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">... y 126 socios más registrados ...</p>
               </div>
