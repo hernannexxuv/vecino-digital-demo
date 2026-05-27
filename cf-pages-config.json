@@ -1,0 +1,27 @@
+{
+  "name": "vecino-digital-demo",
+  "production_branch": "main",
+  "source": {
+    "type": "github",
+    "config": {
+      "owner": "hernannexxuv",
+      "repo_name": "vecino-digital-demo",
+      "production_branch": "main",
+      "pr_comments_enabled": true,
+      "deploy_previews": true
+    }
+  },
+  "build_config": {
+    "build_command": "npm run build",
+    "destination_dir": "dist",
+    "root_dir": ""
+  },
+  "deployment_configs": {
+    "preview": {
+      "environment_variables": {}
+    },
+    "production": {
+      "environment_variables": {}
+    }
+  }
+}
