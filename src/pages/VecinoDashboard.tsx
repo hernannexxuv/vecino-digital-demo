@@ -31,18 +31,26 @@ function CountdownTimer() {
 // Mapa Leaflet Elegante con CartoDB Positron
 function LeafletMap({ coords }: { coords: { lat: number, lon: number } }) {
   const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<L.Map | null>(null);
 
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Inicializamos el mapa sin controles intrusivos para mantener limpieza
+    // Limpiamos cualquier instancia previa (útil para React Strict Mode)
+    if (mapInstance.current) {
+      mapInstance.current.remove();
+    }
+
+    // Inicializamos el mapa
     const map = L.map(mapRef.current, {
       center: [coords.lat, coords.lon],
       zoom: 16,
       zoomControl: false,
       attributionControl: false,
-      dragging: true // Permitimos navegar el mapa
+      dragging: true 
     });
+
+    mapInstance.current = map;
 
     // CartoDB Positron (mapa minimalista, elegante, ideal para dashboards)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -59,18 +67,23 @@ function LeafletMap({ coords }: { coords: { lat: number, lon: number } }) {
 
     L.marker([coords.lat, coords.lon], { icon: customIcon }).addTo(map);
 
-    // Forzamos recalcular tamaño después de que la animación de React termine
-    const timeout = setTimeout(() => {
-      map.invalidateSize();
-    }, 250);
+    // Forzamos recalcular tamaño de forma repetida por si hay animaciones largas
+    const t1 = setTimeout(() => map.invalidateSize(), 100);
+    const t2 = setTimeout(() => map.invalidateSize(), 500);
+    const t3 = setTimeout(() => map.invalidateSize(), 1000);
 
     return () => {
-      clearTimeout(timeout);
-      map.remove(); // Limpieza para evitar errores de react re-mount
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
     };
   }, [coords]);
 
-  return <div ref={mapRef} className="absolute inset-0 z-0" style={{ filter: 'opacity(0.8) grayscale(0.2)' }} />;
+  return <div ref={mapRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 0, filter: 'opacity(0.8) grayscale(0.2)' }} />;
 }
 
 const avisosBarrio = [
