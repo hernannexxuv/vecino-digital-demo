@@ -28,7 +28,7 @@ export default function AsambleaModule() {
   const quorumAlcanzado = porcentajeActual >= quorumReq;
 
   return (
-    <div className="h-full flex flex-col gap-6">
+    <div className="h-auto lg:h-full flex flex-col gap-6">
       
       {/* Header del Módulo */}
       <div className="card-apple p-6 flex justify-between items-center">
@@ -181,7 +181,7 @@ export default function AsambleaModule() {
         </div>
 
         {/* PANEL DERECHO: LISTADO DE SOCIOS (TRANSPARENCIA) */}
-        <div className="lg:col-span-2 card-apple flex flex-col overflow-hidden">
+        <div className="lg:col-span-2 card-apple flex flex-col overflow-hidden min-h-[500px] lg:min-h-0">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
             <h3 className="text-sm font-bold text-slate-800">Padrón Electoral In Situ ({totalSocios} socios)</h3>
             <div className="flex gap-4">
