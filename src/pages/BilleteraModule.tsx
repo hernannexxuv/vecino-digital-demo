@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage, Camera, CheckCircle2, ShieldAlert, Lock } from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 
 interface Transaction { id: number; description: string; amount: string; type: 'income' | 'expense'; date: string; hasReceipt: boolean; }
 
@@ -33,7 +33,24 @@ export default function BilleteraModule() {
     if (!isScanning) return;
     
     let isMounted = true;
-    const html5QrCode = new Html5Qrcode("reader");
+    const html5QrCode = new Html5Qrcode("reader", {
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.QR_CODE,
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.CODE_93,
+        Html5QrcodeSupportedFormats.CODABAR,
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.ITF,
+        Html5QrcodeSupportedFormats.PDF_417,
+        Html5QrcodeSupportedFormats.DATA_MATRIX,
+        Html5QrcodeSupportedFormats.AZTEC,
+      ],
+      verbose: false,
+    });
     
     // Pequeño retraso para asegurar que el div 'reader' ya exista en el DOM
     const timer = setTimeout(() => {
