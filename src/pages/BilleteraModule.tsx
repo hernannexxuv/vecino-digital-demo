@@ -25,6 +25,9 @@ export default function BilleteraModule() {
   const [date, setDate] = useState('');
   const [folio, setFolio] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  
+  // Form validation errors
+  const [formErrors, setFormErrors] = useState<{amount?: string; description?: string; date?: string}>({});
 
   useEffect(() => {
     if (!isScanning) return;
@@ -62,12 +65,27 @@ export default function BilleteraModule() {
   }, [isScanning]);
 
   const handleInitiateSave = () => {
-    if (!description || !amount || !date) return;
+    const errors: {amount?: string; description?: string; date?: string} = {};
+    if (!description.trim()) errors.description = 'Debe ingresar una descripción o concepto.';
+    if (!amount.trim()) errors.amount = 'Debe ingresar un monto.';
+    if (!date.trim()) errors.date = 'Debe ingresar una fecha.';
+    
+    setFormErrors(errors);
+    
+    if (Object.keys(errors).length > 0) return;
     setModalStep('confirm');
   };
 
   const handleConfirmSave = () => {
     setModalStep('password');
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setIsScanning(false);
+    setModalStep('form');
+    setPassword('');
+    setFormErrors({});
   };
 
   const handleFinalSave = () => {
@@ -103,6 +121,7 @@ export default function BilleteraModule() {
       setSaveSuccess(false);
       setModalStep('form');
       setPassword('');
+      setFormErrors({});
     }, 1500);
   };
 
@@ -175,7 +194,7 @@ export default function BilleteraModule() {
       {showModal && (
         <div 
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
-          onClick={() => { setShowModal(false); setIsScanning(false); setModalStep('form'); setPassword(''); }}
+          onClick={() => { closeModal(); }}
         >
           <div 
             className={`rounded-3xl shadow-apple-lg w-full max-w-md p-6 my-8 transition-colors duration-500 border ${
@@ -188,7 +207,7 @@ export default function BilleteraModule() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {modalStep === 'form' ? 'Nuevo Registro' : modalStep === 'confirm' ? 'Confirmación' : 'Firma de Seguridad'}
                 </h3>
-                <button onClick={() => { setShowModal(false); setIsScanning(false); setModalStep('form'); setPassword(''); }} className={`p-2 rounded-xl transition-colors ${
+                <button onClick={() => { closeModal(); }} className={`p-2 rounded-xl transition-colors ${
                   txType === 'income' ? 'bg-emerald-100/50 hover:bg-emerald-200/50 text-emerald-700' : 'bg-orange-100/50 hover:bg-orange-200/50 text-orange-700'
                 }`}><X size={18}/></button>
               </div>
@@ -237,8 +256,10 @@ export default function BilleteraModule() {
                     type="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && password) handleFinalSave(); }}
                     placeholder="Contraseña" 
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    autoFocus
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                   />
                 </div>
                 <div className="flex gap-3 w-full">
@@ -282,10 +303,13 @@ export default function BilleteraModule() {
                   <input 
                     type="text" 
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={(e) => { setAmount(e.target.value); setFormErrors((prev) => ({...prev, amount: undefined})); }}
                     placeholder="Ej. 45000" 
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
+                      formErrors.amount ? 'border-red-400 bg-red-50' : 'border-slate-200 focus:border-blue-500'
+                    }`}
                   />
+                  {formErrors.amount && <p className="text-xs text-red-500 mt-1">{formErrors.amount}</p>}
                 </div>
                 
                 <div>
@@ -293,10 +317,13 @@ export default function BilleteraModule() {
                   <input 
                     type="text" 
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => { setDescription(e.target.value); setFormErrors((prev) => ({...prev, description: undefined})); }}
                     placeholder="Ej. Reparación de..." 
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
+                      formErrors.description ? 'border-red-400 bg-red-50' : 'border-slate-200 focus:border-blue-500'
+                    }`}
                   />
+                  {formErrors.description && <p className="text-xs text-red-500 mt-1">{formErrors.description}</p>}
                 </div>
 
                 <div>
@@ -304,10 +331,13 @@ export default function BilleteraModule() {
                   <input 
                     type="text" 
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
+                    onChange={(e) => { setDate(e.target.value); setFormErrors((prev) => ({...prev, date: undefined})); }}
                     placeholder="Ej. 24 May" 
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
+                      formErrors.date ? 'border-red-400 bg-red-50' : 'border-slate-200 focus:border-blue-500'
+                    }`}
                   />
+                  {formErrors.date && <p className="text-xs text-red-500 mt-1">{formErrors.date}</p>}
                 </div>
               </div>
 
