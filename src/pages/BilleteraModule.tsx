@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage, Camera } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage, Camera, CheckCircle2 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 
 interface Transaction { id: number; description: string; amount: string; type: 'income' | 'expense'; date: string; hasReceipt: boolean; }
@@ -12,6 +12,7 @@ const MOCK_TRANSACTIONS: Transaction[] = [
 
 export default function BilleteraModule() {
   const [showModal, setShowModal] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>(MOCK_TRANSACTIONS);
   
   // Form State
@@ -74,16 +75,21 @@ export default function BilleteraModule() {
       hasReceipt: folio.length > 0
     };
     
-    setTransactions([newTx, ...transactions]);
-    setShowModal(false);
+    setSaveSuccess(true);
     
-    // Reset form
-    setTxType('expense');
-    setAmount('');
-    setDescription('');
-    setDate('');
-    setFolio('');
-    setIsScanning(false);
+    setTimeout(() => {
+      setTransactions([newTx, ...transactions]);
+      setShowModal(false);
+      
+      // Reset form
+      setTxType('expense');
+      setAmount('');
+      setDescription('');
+      setDate('');
+      setFolio('');
+      setIsScanning(false);
+      setSaveSuccess(false);
+    }, 1500);
   };
 
   return (
@@ -163,13 +169,21 @@ export default function BilleteraModule() {
             }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Nuevo Registro</h3>
-              <button onClick={() => { setShowModal(false); setIsScanning(false); }} className={`p-2 rounded-xl transition-colors ${
-                txType === 'income' ? 'bg-emerald-100/50 hover:bg-emerald-200/50 text-emerald-700' : 'bg-orange-100/50 hover:bg-orange-200/50 text-orange-700'
-              }`}><X size={18}/></button>
-            </div>
+            {!saveSuccess && (
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Nuevo Registro</h3>
+                <button onClick={() => { setShowModal(false); setIsScanning(false); }} className={`p-2 rounded-xl transition-colors ${
+                  txType === 'income' ? 'bg-emerald-100/50 hover:bg-emerald-200/50 text-emerald-700' : 'bg-orange-100/50 hover:bg-orange-200/50 text-orange-700'
+                }`}><X size={18}/></button>
+              </div>
+            )}
             
+            {saveSuccess ? (
+              <div className="flex flex-col items-center justify-center py-12 animate-in zoom-in duration-300">
+                <CheckCircle2 className="w-20 h-20 text-emerald-500 mb-4" />
+                <h4 className="text-xl font-bold text-gray-900 text-center">Registro Guardado Exitosamente</h4>
+              </div>
+            ) : (
             <div className="space-y-5">
               {/* Selector de Tipo */}
               <div className={`flex p-1 rounded-xl transition-colors ${txType === 'income' ? 'bg-emerald-100/50' : 'bg-orange-100/50'}`}>
@@ -271,6 +285,7 @@ export default function BilleteraModule() {
                 Guardar Registro
               </button>
             </div>
+            )}
           </div>
         </div>
       )}
