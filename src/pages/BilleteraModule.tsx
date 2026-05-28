@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage, Camera } from 'lucide-react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 
 interface Transaction { id: number; description: string; amount: string; type: 'income' | 'expense'; date: string; hasReceipt: boolean; }
 
@@ -25,22 +25,35 @@ export default function BilleteraModule() {
   useEffect(() => {
     if (!isScanning) return;
     
-    const scanner = new Html5QrcodeScanner('reader', { 
-      qrbox: { width: 250, height: 250 }, 
-      fps: 5 
-    }, false);
+    let isMounted = true;
+    const html5QrCode = new Html5Qrcode("reader");
     
-    scanner.render(
-      (decodedText) => {
-        setFolio(decodedText);
-        setIsScanning(false);
-        scanner.clear().catch(console.error);
-      },
-      () => { /* ignorar fallos de frame */ }
-    );
+    // Pequeño retraso para asegurar que el div 'reader' ya exista en el DOM
+    const timer = setTimeout(() => {
+      if (!isMounted) return;
+      html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          if (isMounted) {
+            setFolio(decodedText);
+            setIsScanning(false);
+          }
+        },
+        () => { /* ignorar fallos de frame */ }
+      ).catch((err) => {
+        console.warn("Error al iniciar la cámara automáticamente (quizás faltan permisos): ", err);
+      });
+    }, 100);
     
     return () => {
-      scanner.clear().catch(console.error);
+      isMounted = false;
+      clearTimeout(timer);
+      try {
+        html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => {});
+      } catch (e) {
+        // Ignorar si tira error al intentar detener algo que no había empezado
+      }
     };
   }, [isScanning]);
 
