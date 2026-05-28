@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage, Camera } from 'lucide-react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 interface Transaction { id: number; description: string; amount: string; type: 'income' | 'expense'; date: string; hasReceipt: boolean; }
 
@@ -19,6 +20,29 @@ export default function BilleteraModule() {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [folio, setFolio] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
+
+  useEffect(() => {
+    if (!isScanning) return;
+    
+    const scanner = new Html5QrcodeScanner('reader', { 
+      qrbox: { width: 250, height: 250 }, 
+      fps: 5 
+    }, false);
+    
+    scanner.render(
+      (decodedText) => {
+        setFolio(decodedText);
+        setIsScanning(false);
+        scanner.clear().catch(console.error);
+      },
+      () => { /* ignorar fallos de frame */ }
+    );
+    
+    return () => {
+      scanner.clear().catch(console.error);
+    };
+  }, [isScanning]);
 
   const handleSave = () => {
     if (!description || !amount || !date) return;
@@ -46,6 +70,7 @@ export default function BilleteraModule() {
     setDescription('');
     setDate('');
     setFolio('');
+    setIsScanning(false);
   };
 
   return (
@@ -117,7 +142,7 @@ export default function BilleteraModule() {
       {showModal && (
         <div 
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
-          onClick={() => setShowModal(false)}
+          onClick={() => { setShowModal(false); setIsScanning(false); }}
         >
           <div 
             className={`rounded-3xl shadow-apple-lg w-full max-w-md p-6 my-8 transition-colors duration-500 border ${
@@ -127,7 +152,7 @@ export default function BilleteraModule() {
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Nuevo Registro</h3>
-              <button onClick={() => setShowModal(false)} className={`p-2 rounded-xl transition-colors ${
+              <button onClick={() => { setShowModal(false); setIsScanning(false); }} className={`p-2 rounded-xl transition-colors ${
                 txType === 'income' ? 'bg-emerald-100/50 hover:bg-emerald-200/50 text-emerald-700' : 'bg-orange-100/50 hover:bg-orange-200/50 text-orange-700'
               }`}><X size={18}/></button>
             </div>
@@ -189,15 +214,29 @@ export default function BilleteraModule() {
               <div className="pt-4 border-t border-slate-100">
                 <label className="block text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">Respaldo Legal SII</label>
                 
-                <button className="w-full flex flex-col items-center justify-center gap-2 py-6 px-4 border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all group mb-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Camera className="w-6 h-6 text-blue-600" />
+                {!isScanning ? (
+                  <button 
+                    onClick={() => setIsScanning(true)}
+                    className="w-full flex flex-col items-center justify-center gap-2 py-6 px-4 border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all group mb-4">
+                    <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Camera className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-900">Escanear Boleta</p>
+                      <p className="text-xs text-gray-500">(QR / Código de Barras)</p>
+                    </div>
+                  </button>
+                ) : (
+                  <div className="mb-4">
+                    <div id="reader" className="w-full bg-slate-900 rounded-xl overflow-hidden mb-2"></div>
+                    <button 
+                      onClick={() => setIsScanning(false)}
+                      className="w-full py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
+                    >
+                      Cancelar Escaneo
+                    </button>
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-gray-900">Escanear Boleta</p>
-                    <p className="text-xs text-gray-500">(QR / Código de Barras)</p>
-                  </div>
-                </button>
+                )}
 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">O ingresar manualmente N° de Boleta o Folio</label>
