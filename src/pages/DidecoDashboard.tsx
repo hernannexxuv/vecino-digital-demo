@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Target, Users, MapPin, CheckCircle2, CloudLightning, Activity, ChevronRight, FileText, BarChart3, Send, Megaphone, X } from 'lucide-react';
 import SelectDropdown from '../components/ui/SelectDropdown';
+import LeafletMapView from '../components/map/LeafletMapView';
 
 const comunalMetrics = [
   { id: 1, label: 'Juntas de Vecinos Activas', value: '142', icon: Target, color: 'text-primary', bg: 'bg-primary-light' },
@@ -94,17 +95,8 @@ export default function DidecoDashboard() {
             </div>
           </div>
           
-          <div className="flex-1 p-6 flex flex-col">
-            <div className="flex-1 bg-slate-50 rounded-2xl p-4 flex items-center justify-center border border-slate-100 relative overflow-hidden group">
-              <div className="absolute top-1/4 left-1/3 w-32 h-32 rounded-full bg-secondary opacity-20 blur-3xl animate-pulse" />
-              <div className="absolute bottom-1/3 right-1/4 w-24 h-24 rounded-full bg-primary opacity-20 blur-2xl animate-pulse" style={{ animationDelay: '1s'}} />
-              
-              <div className="text-center z-10 p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-white shadow-apple">
-                <MapPin className="w-8 h-8 text-primary mx-auto mb-2" />
-                <p className="text-xs font-black text-primary uppercase tracking-wider">Inteligencia Territorial</p>
-                <p className="text-[10px] text-slate-500 mt-1">Integración simulada Temuco SmartCity</p>
-              </div>
-            </div>
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <LeafletMapView readonly />
           </div>
         </div>
 
