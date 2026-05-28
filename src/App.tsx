@@ -3,11 +3,12 @@ import { Layout } from './layouts/Layout';
 import AsambleaModule from './pages/AsambleaModule';
 import BilleteraModule from './pages/BilleteraModule';
 import FirmaModule from './pages/FirmaModule';
-import DidecoDashboard from './pages/DidecoDashboard'; // Importamos la vista real
+import DidecoDashboard from './pages/DidecoDashboard';
 import VecinoDashboard from './pages/VecinoDashboard';
 import MapaComunal from './pages/MapaComunal';
 import IncidenciasModule from './pages/IncidenciasModule';
 import PresidenteDashboard from './pages/PresidenteDashboard';
+import SociosModule from './pages/SociosModule';
 
 // ==========================================
 // ENRUTADOR PRINCIPAL
@@ -29,6 +30,7 @@ export default function App() {
 
           {/* Rutas de Rol: Junta de Vecinos (Directiva) */}
           <Route path="/directiva/dashboard" element={<PresidenteDashboard />} />
+          <Route path="/directiva/socios" element={<SociosModule />} />
           <Route path="/directiva/asamblea" element={<AsambleaModule />} />
           <Route path="/directiva/tesoreria" element={<BilleteraModule />} />
           <Route path="/directiva/firmas" element={<FirmaModule />} />

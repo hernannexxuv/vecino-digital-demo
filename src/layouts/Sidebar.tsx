@@ -9,7 +9,8 @@ import {
   Menu,
   ShieldCheck,
   ShieldAlert,
-  AlertTriangle
+  AlertTriangle,
+  ContactRound
 } from 'lucide-react';
 import type { Role, DirectivaRole } from '../data/mockData';
 
@@ -47,16 +48,19 @@ export default function Sidebar({ currentRole, currentSubRole, isOpen, setIsOpen
     if (currentSubRole === 'presidente') {
       currentMenu = [
         { path: '/directiva/dashboard', label: 'Dashboard de Gestión', icon: LayoutDashboard },
+        { path: '/directiva/socios', label: 'Socios', icon: ContactRound },
         { path: '/directiva/asamblea', label: 'Asambleas', icon: Users },
       ];
     } else if (currentSubRole === 'tesorero') {
       currentMenu = [
         { path: '/directiva/tesoreria', label: 'Billetera Digital', icon: Wallet },
+        { path: '/directiva/socios', label: 'Socios', icon: ContactRound },
       ];
     } else if (currentSubRole === 'secretario') {
       currentMenu = [
         { path: '/directiva/asamblea', label: 'Gestión de Actas', icon: Users },
         { path: '/directiva/firmas', label: 'Gestión de Firmas', icon: FileCheck },
+        { path: '/directiva/socios', label: 'Socios', icon: ContactRound },
       ];
     }
   }

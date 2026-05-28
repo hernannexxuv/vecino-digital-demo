@@ -46,7 +46,7 @@ export default function Topbar({ currentRole, setCurrentRole, currentSubRole, se
           className="h-8 w-auto object-contain shrink-0" 
         />
         <h1 className="text-lg font-bold text-slate-900 hidden sm:block tracking-tighter">
-          Plataforma GovTech · Ilustre Municipalidad de Temuco
+          Plataforma GovTech · creado por NEXXUV
         </h1>
       </div>
 
