@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage, Camera, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage, Camera, CheckCircle2, ShieldAlert, Lock } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 
 interface Transaction { id: number; description: string; amount: string; type: 'income' | 'expense'; date: string; hasReceipt: boolean; }
@@ -14,6 +14,9 @@ export default function BilleteraModule() {
   const [showModal, setShowModal] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>(MOCK_TRANSACTIONS);
+  
+  const [modalStep, setModalStep] = useState<'form' | 'confirm' | 'password'>('form');
+  const [password, setPassword] = useState('');
   
   // Form State
   const [txType, setTxType] = useState<'income' | 'expense'>('expense');
@@ -58,8 +61,17 @@ export default function BilleteraModule() {
     };
   }, [isScanning]);
 
-  const handleSave = () => {
+  const handleInitiateSave = () => {
     if (!description || !amount || !date) return;
+    setModalStep('confirm');
+  };
+
+  const handleConfirmSave = () => {
+    setModalStep('password');
+  };
+
+  const handleFinalSave = () => {
+    if (!password) return;
     
     let formattedAmount = amount;
     if (!formattedAmount.startsWith('$')) {
@@ -89,6 +101,8 @@ export default function BilleteraModule() {
       setFolio('');
       setIsScanning(false);
       setSaveSuccess(false);
+      setModalStep('form');
+      setPassword('');
     }, 1500);
   };
 
@@ -161,7 +175,7 @@ export default function BilleteraModule() {
       {showModal && (
         <div 
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
-          onClick={() => { setShowModal(false); setIsScanning(false); }}
+          onClick={() => { setShowModal(false); setIsScanning(false); setModalStep('form'); setPassword(''); }}
         >
           <div 
             className={`rounded-3xl shadow-apple-lg w-full max-w-md p-6 my-8 transition-colors duration-500 border ${
@@ -171,8 +185,10 @@ export default function BilleteraModule() {
           >
             {!saveSuccess && (
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Nuevo Registro</h3>
-                <button onClick={() => { setShowModal(false); setIsScanning(false); }} className={`p-2 rounded-xl transition-colors ${
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {modalStep === 'form' ? 'Nuevo Registro' : modalStep === 'confirm' ? 'Confirmación' : 'Firma de Seguridad'}
+                </h3>
+                <button onClick={() => { setShowModal(false); setIsScanning(false); setModalStep('form'); setPassword(''); }} className={`p-2 rounded-xl transition-colors ${
                   txType === 'income' ? 'bg-emerald-100/50 hover:bg-emerald-200/50 text-emerald-700' : 'bg-orange-100/50 hover:bg-orange-200/50 text-orange-700'
                 }`}><X size={18}/></button>
               </div>
@@ -182,6 +198,64 @@ export default function BilleteraModule() {
               <div className="flex flex-col items-center justify-center py-12 animate-in zoom-in duration-300">
                 <CheckCircle2 className="w-20 h-20 text-emerald-500 mb-4" />
                 <h4 className="text-xl font-bold text-gray-900 text-center">Registro Guardado Exitosamente</h4>
+              </div>
+            ) : modalStep === 'confirm' ? (
+              <div className="flex flex-col items-center justify-center py-8 animate-in fade-in duration-300">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6">
+                  <ShieldAlert className="w-8 h-8 text-orange-600" />
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 text-center mb-2">¿Está seguro?</h4>
+                <p className="text-sm text-gray-500 text-center mb-8 px-4">
+                  ¿Está seguro que desea registrar este movimiento contable en la Caja Chica?
+                </p>
+                <div className="flex gap-3 w-full">
+                  <button 
+                    onClick={() => setModalStep('form')}
+                    className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={handleConfirmSave}
+                    className="flex-1 py-3.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-xl shadow-apple transition-colors"
+                  >
+                    Sí, continuar
+                  </button>
+                </div>
+              </div>
+            ) : modalStep === 'password' ? (
+              <div className="flex flex-col items-center justify-center py-8 animate-in fade-in duration-300">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                  <Lock className="w-8 h-8 text-blue-600" />
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 text-center mb-2">Firma Digital</h4>
+                <p className="text-sm text-gray-500 text-center mb-6 px-4">
+                  Ingrese su contraseña de usuario para firmar este registro financiero.
+                </p>
+                <div className="w-full mb-8">
+                  <input 
+                    type="password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Contraseña" 
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  />
+                </div>
+                <div className="flex gap-3 w-full">
+                  <button 
+                    onClick={() => setModalStep('confirm')}
+                    className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors"
+                  >
+                    Atrás
+                  </button>
+                  <button 
+                    onClick={handleFinalSave}
+                    disabled={!password}
+                    className="flex-1 py-3.5 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white text-sm font-semibold rounded-xl shadow-apple transition-colors"
+                  >
+                    Firmar y Guardar
+                  </button>
+                </div>
               </div>
             ) : (
             <div className="space-y-5">
@@ -279,7 +353,7 @@ export default function BilleteraModule() {
 
               {/* Botón Guardar */}
               <button 
-                onClick={handleSave}
+                onClick={handleInitiateSave}
                 className="w-full py-3.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-xl shadow-apple transition-colors mt-6"
               >
                 Guardar Registro
