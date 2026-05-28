@@ -1,12 +1,86 @@
-import { Map, MapPin, Search, Filter, AlertTriangle } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { Map, Search, Filter } from 'lucide-react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const sectoresTemuco = [
-  { id: 1, name: 'Amanecer', status: 'optimal', jvActivas: 12, asambleas: 4, color: 'bg-secondary' },
-  { id: 2, name: 'Pedro de Valdivia', status: 'optimal', jvActivas: 18, asambleas: 5, color: 'bg-secondary' },
-  { id: 3, name: 'Pueblo Nuevo', status: 'warning', jvActivas: 8, asambleas: 1, color: 'bg-accent' },
-  { id: 4, name: 'Fundo el Carmen', status: 'optimal', jvActivas: 22, asambleas: 8, color: 'bg-secondary' },
-  { id: 5, name: 'Centro', status: 'review', jvActivas: 5, asambleas: 0, color: 'bg-slate-400' },
+  { id: 1, name: 'Amanecer', status: 'optimal', jvActivas: 12, asambleas: 4, color: 'bg-secondary', coords: [-38.7513, -72.6105] },
+  { id: 2, name: 'Pedro de Valdivia', status: 'optimal', jvActivas: 18, asambleas: 5, color: 'bg-secondary', coords: [-38.7366, -72.6186] },
+  { id: 3, name: 'Pueblo Nuevo', status: 'warning', jvActivas: 8, asambleas: 1, color: 'bg-accent', coords: [-38.7183, -72.5833] },
+  { id: 4, name: 'Fundo el Carmen', status: 'optimal', jvActivas: 22, asambleas: 8, color: 'bg-secondary', coords: [-38.7291, -72.6384] },
+  { id: 5, name: 'Centro', status: 'review', jvActivas: 5, asambleas: 0, color: 'bg-slate-400', coords: [-38.7359, -72.5904] },
 ];
+
+function LeafletMapComunal() {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    if (mapInstance.current) {
+      mapInstance.current.remove();
+    }
+
+    const map = L.map(mapRef.current, {
+      center: [-38.7359, -72.6000],
+      zoom: 13,
+      zoomControl: false,
+      attributionControl: false,
+      dragging: true 
+    });
+
+    mapInstance.current = map;
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    sectoresTemuco.forEach(sector => {
+      const isWarning = sector.status === 'warning';
+      const textSecondary = sector.status === 'review' ? 'text-slate-500' : (isWarning ? 'text-accent' : 'text-secondary');
+      
+      const alertSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`;
+
+      const customIcon = L.divIcon({
+        className: 'bg-transparent',
+        html: `
+          <div class="relative group cursor-pointer" style="width: 16px; height: 16px;">
+            <div class="absolute -inset-4 ${sector.color}/20 rounded-full blur-md animate-pulse"></div>
+            <div class="absolute -inset-1 ${sector.color}/40 rounded-full animate-ping" style="animation-duration: ${isWarning ? '2s' : '3s'}"></div>
+            <div class="relative w-4 h-4 ${sector.color} border-2 border-white rounded-full shadow-lg flex items-center justify-center">
+              ${isWarning ? alertSvg : ''}
+            </div>
+            <div class="absolute top-6 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-apple border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[1000] pointer-events-none">
+              <p class="text-xs font-bold text-slate-800">${sector.name}</p>
+              <p class="text-[10px] ${textSecondary} font-bold">${isWarning ? `Baja Participación (${sector.jvActivas} JVs)` : `${sector.jvActivas} JVs Activas`}</p>
+            </div>
+          </div>
+        `,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+      });
+
+      L.marker(sector.coords as [number, number], { icon: customIcon }).addTo(map);
+    });
+
+    const t1 = setTimeout(() => map.invalidateSize(), 100);
+    const t2 = setTimeout(() => map.invalidateSize(), 500);
+    const t3 = setTimeout(() => map.invalidateSize(), 1000);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
+    };
+  }, []);
+
+  return <div ref={mapRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 0, filter: 'opacity(0.8) grayscale(0.2)' }} />;
+}
 
 export default function MapaComunal() {
   return (
@@ -88,60 +162,9 @@ export default function MapaComunal() {
             </div>
           </div>
 
-          {/* Canvas del Mapa (Visualización Abstracta) */}
-          <div className="flex-1 w-full h-full relative flex items-center justify-center overflow-hidden">
-            {/* Grilla de fondo simulando cartografía */}
-            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-            
-            {/* Elementos geográficos abstractos */}
-            <div className="absolute w-[800px] h-[600px] border border-slate-300 rounded-[100px] rotate-12 opacity-20" />
-            <div className="absolute w-[600px] h-[400px] border-2 border-slate-300 rounded-[80px] -rotate-6 opacity-30" />
-            
-            {/* Puntos GPS Animados (Simulando Juntas de Vecinos) */}
-            
-            {/* Fundo el Carmen */}
-            <div className="absolute top-1/4 left-1/4 group cursor-pointer">
-              <div className="relative">
-                <div className="absolute -inset-4 bg-secondary/20 rounded-full blur-md animate-pulse" />
-                <div className="absolute -inset-1 bg-secondary/40 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
-                <div className="relative w-4 h-4 bg-secondary border-2 border-white rounded-full shadow-lg" />
-              </div>
-              <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-apple border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
-                <p className="text-xs font-bold text-slate-800">Fundo el Carmen</p>
-                <p className="text-[10px] text-secondary font-bold">22 JVs Activas</p>
-              </div>
-            </div>
-
-            {/* Pedro de Valdivia */}
-            <div className="absolute bottom-1/3 right-1/3 group cursor-pointer">
-              <div className="relative">
-                <div className="absolute -inset-3 bg-secondary/20 rounded-full blur-md animate-pulse" />
-                <div className="absolute -inset-1 bg-secondary/40 rounded-full animate-ping" style={{ animationDuration: '2.5s', animationDelay: '1s' }} />
-                <div className="relative w-4 h-4 bg-secondary border-2 border-white rounded-full shadow-lg" />
-              </div>
-            </div>
-
-            {/* Pueblo Nuevo (Alerta) */}
-            <div className="absolute top-1/3 right-1/4 group cursor-pointer">
-              <div className="relative">
-                <div className="absolute -inset-4 bg-accent/20 rounded-full blur-md animate-pulse" />
-                <div className="absolute -inset-1 bg-accent/40 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
-                <div className="relative w-4 h-4 bg-accent border-2 border-white rounded-full shadow-lg flex items-center justify-center">
-                  <AlertTriangle size={8} className="text-white" />
-                </div>
-              </div>
-              <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-apple border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
-                <p className="text-xs font-bold text-slate-800">Pueblo Nuevo</p>
-                <p className="text-[10px] text-accent font-bold">Baja Participación (8 JVs)</p>
-              </div>
-            </div>
-
-            {/* Centro del Mapa (Marca de agua) */}
-            <div className="z-0 opacity-40 flex flex-col items-center">
-              <MapPin size={48} className="text-slate-300" />
-              <span className="text-2xl font-black text-slate-300 tracking-tighter mt-2">TEMUCO</span>
-            </div>
-            
+          {/* Canvas del Mapa (Leaflet) */}
+          <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100">
+            <LeafletMapComunal />
           </div>
         </div>
       </div>

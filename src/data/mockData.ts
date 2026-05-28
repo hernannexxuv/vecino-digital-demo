@@ -1,6 +1,7 @@
 // src/data/mockData.ts
 
 export type Role = 'superadmin' | 'municipalidad' | 'directiva' | 'vecino';
+export type DirectivaRole = 'presidente' | 'tesorero' | 'secretario';
 
 export interface RoleInfoItem {
   name: string;

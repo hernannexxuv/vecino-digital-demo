@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import type { Role } from '../data/mockData';
+import type { Role, DirectivaRole } from '../data/mockData';
 
 export function Layout() {
   const [currentRole, setCurrentRole] = useState<Role>('municipalidad');
+  const [currentSubRole, setCurrentSubRole] = useState<DirectivaRole>('presidente');
   // Iniciar cerrado en celulares, abierto en desktop
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const location = useLocation();
@@ -31,7 +32,7 @@ export function Layout() {
   }, []);
 
   return (
-    <div className="flex h-[100dvh] w-screen bg-gray-50 overflow-hidden font-sans text-gray-900 antialiased relative">
+    <div className="flex h-[100dvh] w-screen bg-slate-50 overflow-hidden font-sans text-slate-900 antialiased relative">
       
       {/* OVERLAY: Capa oscura para móviles (solo visible si el menú está abierto) */}
       {isSidebarOpen && (
@@ -43,7 +44,8 @@ export function Layout() {
 
       {/* Barra Lateral (Navegación) */}
       <Sidebar 
-        currentRole={currentRole} 
+        currentRole={currentRole}
+        currentSubRole={currentSubRole}
         isOpen={isSidebarOpen} 
         setIsOpen={setIsSidebarOpen} 
       />
@@ -53,14 +55,16 @@ export function Layout() {
         {/* Barra Superior (Selector de Roles, Notificaciones, Perfil) */}
         <Topbar 
           currentRole={currentRole} 
-          setCurrentRole={setCurrentRole} 
+          setCurrentRole={setCurrentRole}
+          currentSubRole={currentSubRole}
+          setCurrentSubRole={setCurrentSubRole}
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
 
         {/* Contenido Dinámico de la Ruta Actual */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 scrollbar-hidden relative">
-          <div className="max-w-7xl mx-auto h-full">
-            <Outlet context={{ currentRole }} />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 scrollbar-hidden relative">
+          <div className="max-w-7xl mx-auto min-h-full">
+            <Outlet context={{ currentRole, currentSubRole }} />
           </div>
         </main>
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Receipt, Eye, Plus, X, FileImage, Camera } from 'lucide-react';
 
 interface Transaction { id: number; description: string; amount: string; type: 'income' | 'expense'; date: string; hasReceipt: boolean; }
 
@@ -11,6 +11,42 @@ const MOCK_TRANSACTIONS: Transaction[] = [
 
 export default function BilleteraModule() {
   const [showModal, setShowModal] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>(MOCK_TRANSACTIONS);
+  
+  // Form State
+  const [txType, setTxType] = useState<'income' | 'expense'>('expense');
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [date, setDate] = useState('');
+  const [folio, setFolio] = useState('');
+
+  const handleSave = () => {
+    if (!description || !amount || !date) return;
+    
+    let formattedAmount = amount;
+    if (!formattedAmount.startsWith('$')) {
+      formattedAmount = `$${formattedAmount}`;
+    }
+
+    const newTx: Transaction = {
+      id: Date.now(),
+      description,
+      amount: formattedAmount,
+      type: txType,
+      date,
+      hasReceipt: folio.length > 0
+    };
+    
+    setTransactions([newTx, ...transactions]);
+    setShowModal(false);
+    
+    // Reset form
+    setTxType('expense');
+    setAmount('');
+    setDescription('');
+    setDate('');
+    setFolio('');
+  };
 
   return (
     <div className="flex flex-col lg:h-full">
@@ -32,12 +68,12 @@ export default function BilleteraModule() {
           <p className="text-xs text-gray-400 mb-1">Egresos Totales</p>
           <p className="text-2xl font-bold text-gray-900">$890.500</p>
         </div>
-        <div className="bg-gray-900 rounded-2xl shadow-apple-md p-5">
+        <div className="bg-gradient-to-br from-emerald-600 to-teal-800 rounded-2xl shadow-apple-lg p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center"><Wallet className="w-4.5 h-4.5 text-green-400" /></div>
-            <span className="text-[10px] font-semibold text-green-400 bg-green-900/30 px-2 py-0.5 rounded-lg">Caja Chica</span>
+            <div className="w-9 h-9 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm"><Wallet className="w-4.5 h-4.5 text-white" /></div>
+            <span className="text-[10px] font-semibold text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded-lg">Caja Chica</span>
           </div>
-          <p className="text-xs text-gray-400 mb-1">Saldo Actual</p>
+          <p className="text-xs text-emerald-100 mb-1">Saldo Actual</p>
           <p className="text-2xl font-bold text-white">$359.500</p>
         </div>
       </div>
@@ -51,7 +87,7 @@ export default function BilleteraModule() {
           </div>
         </div>
         <div className="flex-1 overflow-auto p-4 scrollbar-hidden space-y-2">
-          {MOCK_TRANSACTIONS.map((tx) => (
+          {transactions.map((tx) => (
             <div key={tx.id} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${tx.type === 'income' ? 'bg-green-50' : 'bg-red-50'}`}>
                 {tx.type === 'income' ? <TrendingUp className="w-4 h-4 text-green-600" /> : <TrendingDown className="w-4 h-4 text-red-500" />}
@@ -73,19 +109,116 @@ export default function BilleteraModule() {
         </div>
       </div>
 
-      <button onClick={() => setShowModal(true)} className="fixed bottom-8 right-8 flex items-center gap-2 bg-gray-900 text-white px-5 py-3.5 rounded-2xl shadow-apple-lg hover:bg-gray-800 transition-all z-50">
+      <button onClick={() => setShowModal(true)} className="fixed bottom-8 right-8 flex items-center gap-2 bg-primary text-white px-5 py-3.5 rounded-2xl shadow-apple-lg hover:bg-primary-dark transition-all z-50">
         <Plus className="w-5 h-5" /> <span className="text-sm font-semibold">Nuevo Registro</span>
       </button>
 
       {/* Modal Simplificado */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-apple-lg w-full max-w-md p-6">
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            className={`rounded-3xl shadow-apple-lg w-full max-w-md p-6 my-8 transition-colors duration-500 border ${
+              txType === 'income' ? 'bg-emerald-50/95 border-emerald-200/50' : 'bg-orange-50/95 border-orange-200/50'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold">Nuevo Registro</h3>
-              <button onClick={() => setShowModal(false)} className="p-1 rounded-xl bg-slate-50"><X size={16}/></button>
+              <h3 className="text-lg font-semibold text-gray-900">Nuevo Registro</h3>
+              <button onClick={() => setShowModal(false)} className={`p-2 rounded-xl transition-colors ${
+                txType === 'income' ? 'bg-emerald-100/50 hover:bg-emerald-200/50 text-emerald-700' : 'bg-orange-100/50 hover:bg-orange-200/50 text-orange-700'
+              }`}><X size={18}/></button>
             </div>
-            <p className="text-sm text-gray-500 text-center py-8">Formulario de carga estático para la demo.</p>
+            
+            <div className="space-y-5">
+              {/* Selector de Tipo */}
+              <div className={`flex p-1 rounded-xl transition-colors ${txType === 'income' ? 'bg-emerald-100/50' : 'bg-orange-100/50'}`}>
+                <button
+                  onClick={() => setTxType('income')}
+                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${txType === 'income' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Ingreso
+                </button>
+                <button
+                  onClick={() => setTxType('expense')}
+                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${txType === 'expense' ? 'bg-white text-orange-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Egreso
+                </button>
+              </div>
+
+              {/* Campos Básicos */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Monto ($)</label>
+                  <input 
+                    type="text" 
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Ej. 45000" 
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Descripción / Concepto</label>
+                  <input 
+                    type="text" 
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Ej. Reparación de..." 
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Fecha</label>
+                  <input 
+                    type="text" 
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    placeholder="Ej. 24 May" 
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Sección Respaldo Legal SII */}
+              <div className="pt-4 border-t border-slate-100">
+                <label className="block text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">Respaldo Legal SII</label>
+                
+                <button className="w-full flex flex-col items-center justify-center gap-2 py-6 px-4 border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all group mb-4">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Camera className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-gray-900">Escanear Boleta</p>
+                    <p className="text-xs text-gray-500">(QR / Código de Barras)</p>
+                  </div>
+                </button>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">O ingresar manualmente N° de Boleta o Folio</label>
+                  <input 
+                    type="text" 
+                    value={folio}
+                    onChange={(e) => setFolio(e.target.value)}
+                    placeholder="Ej. 123456789" 
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Botón Guardar */}
+              <button 
+                onClick={handleSave}
+                className="w-full py-3.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-xl shadow-apple transition-colors mt-6"
+              >
+                Guardar Registro
+              </button>
+            </div>
           </div>
         </div>
       )}

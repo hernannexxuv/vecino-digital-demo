@@ -3,20 +3,19 @@ import { Megaphone, AlertTriangle, QrCode, ArrowRight, ShieldCheck, MapPin, Cloc
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Variable global para que todos los cronómetros estén 100% sincronizados
-// y cuenten desde el momento en que se carga la página (el script).
-const GLOBAL_END_TIME = Date.now() + 15 * 60 * 1000;
-
-// Componente Timer Aislado: Maneja su propio estado para evitar bloqueos por re-renders del padre
-function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState(() => Math.max(0, Math.floor((GLOBAL_END_TIME - Date.now()) / 1000)));
+// Componente Timer Aislado: Maneja su propio estado
+function CountdownTimer({ minutes = 15 }: { minutes?: number }) {
+  const [timeLeft, setTimeLeft] = useState(minutes * 60);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.max(0, Math.floor((GLOBAL_END_TIME - now) / 1000));
-      setTimeLeft(remaining);
-      if (remaining <= 0) clearInterval(timer);
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -150,7 +149,7 @@ export default function VecinoDashboard() {
   };
 
   return (
-    <div className="h-auto lg:h-full flex flex-col gap-6 relative">
+    <div className="min-h-full flex flex-col gap-6 relative">
       
       {/* ========================================== */}
       {/* BOTÓN PARA SIMULAR EL ENVÍO DESDE DIRECTIVA */}
@@ -187,17 +186,17 @@ export default function VecinoDashboard() {
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
         {/* Columna Izquierda: Credencial Digital */}
         <div className="lg:col-span-1 flex flex-col gap-6">
-          <div className="bg-gradient-to-br from-primary to-[#005582] rounded-3xl p-6 shadow-apple-lg text-white relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 blur-3xl rounded-full" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-secondary opacity-20 blur-3xl rounded-full" />
+          <div className="bg-gradient-to-br from-primary via-primary to-[#003d5c] rounded-3xl p-6 shadow-xl shadow-primary/20 text-white relative overflow-hidden group border border-white/20 hover:scale-[1.02] transition-transform duration-300">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-white opacity-10 blur-3xl rounded-full" />
+            <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-secondary opacity-20 blur-3xl rounded-full" />
             <div className="flex justify-between items-start mb-8 relative z-10">
               <div>
-                <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-1">Credencial Digital</p>
-                <p className="font-black text-lg leading-tight tracking-tight">Socio Activo</p>
+                <p className="text-[10px] text-white/80 uppercase tracking-widest font-bold mb-1">Credencial Digital</p>
+                <p className="font-black text-xl leading-tight tracking-tight shadow-sm">Socio Activo</p>
               </div>
-              <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-md border border-white/20">
+              <button className="bg-white/10 hover:bg-white/20 p-2.5 rounded-xl backdrop-blur-md border border-white/20 transition-all duration-300 hover:shadow-lg active:scale-95">
                 <QrCode size={24} className="text-white" />
-              </div>
+              </button>
             </div>
             <div className="space-y-1 relative z-10">
               <p className="text-xl font-black tracking-tight">Hernán Millahual V.</p>
@@ -214,17 +213,17 @@ export default function VecinoDashboard() {
         </div>
 
         {/* Columna Derecha: Muro Vecinal */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-apple flex flex-col overflow-hidden min-h-[500px] lg:min-h-0">
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-lg font-bold text-slate-900">Muro Vecinal Temuco</h3>
-            <button className="text-xs font-bold text-primary hover:text-primary-dark transition-colors">Ver todo</button>
+        <div className="lg:col-span-2 bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/60 shadow-xl shadow-slate-200/40 flex flex-col overflow-hidden min-h-[500px] lg:min-h-0">
+          <div className="p-6 border-b border-slate-100/80 flex items-center justify-between bg-white/50">
+            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Muro Vecinal Temuco</h3>
+            <button className="text-xs font-bold text-primary hover:text-primary-dark hover:bg-primary/5 px-3 py-1.5 rounded-full transition-colors">Ver todo</button>
           </div>
           
           <div className="flex-1 overflow-auto p-6 space-y-4 scrollbar-hidden">
             {avisosBarrio.map((aviso) => {
               const Icon = aviso.icon;
               return (
-                <div key={aviso.id} className="flex gap-4 p-4 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-apple-md transition-all bg-white group cursor-pointer">
+                <div key={aviso.id} className="flex gap-4 p-4 rounded-2xl border border-slate-100 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-0.5 transition-all duration-300 bg-white group cursor-pointer">
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${aviso.bg}`}>
                     <Icon className={`w-6 h-6 ${aviso.color}`} />
                   </div>
@@ -243,21 +242,21 @@ export default function VecinoDashboard() {
             })}
 
             {/* Módulo Encuesta Rápida - Mezclando el Azul y Verde institucionales */}
-            <div className="mt-6 bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 text-white shadow-apple-md relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 blur-2xl rounded-full" />
+            <div className="mt-6 bg-gradient-to-r from-primary to-[#009c7a] rounded-2xl p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden border border-white/10 group">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white opacity-10 blur-2xl rounded-full group-hover:scale-110 transition-transform duration-700" />
               <div className="relative z-10">
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="bg-white/20 backdrop-blur-sm text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest mb-3 inline-block border border-white/20">
+                    <span className="bg-white/20 backdrop-blur-md text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest mb-3 inline-block border border-white/20 shadow-sm">
                       Participación DIDECO
                     </span>
-                    <p className="font-bold text-base mb-1">¿Qué taller municipal prefieres este invierno?</p>
-                    <p className="text-xs text-white/80 font-medium">Tu opinión ayuda a organizar los recursos comunales.</p>
+                    <p className="font-bold text-lg mb-1 leading-tight">¿Qué taller municipal prefieres este invierno?</p>
+                    <p className="text-xs text-white/90 font-medium">Tu opinión ayuda a organizar los recursos comunales.</p>
                   </div>
                 </div>
                 <div className="mt-5 grid grid-cols-2 gap-3">
-                  <button className="bg-white/10 hover:bg-white/20 transition-colors py-2.5 rounded-xl text-xs font-bold border border-white/20 backdrop-blur-sm shadow-sm">Deportes Indoor</button>
-                  <button className="bg-white/10 hover:bg-white/20 transition-colors py-2.5 rounded-xl text-xs font-bold border border-white/20 backdrop-blur-sm shadow-sm">Computación Básica</button>
+                  <button className="bg-white/10 hover:bg-white/20 active:scale-95 transition-all duration-300 py-3 rounded-xl text-xs font-bold border border-white/20 backdrop-blur-sm shadow-sm hover:shadow-md">Deportes Indoor</button>
+                  <button className="bg-white/10 hover:bg-white/20 active:scale-95 transition-all duration-300 py-3 rounded-xl text-xs font-bold border border-white/20 backdrop-blur-sm shadow-sm hover:shadow-md">Computación Básica</button>
                 </div>
               </div>
             </div>
@@ -272,18 +271,18 @@ export default function VecinoDashboard() {
       {/* PASO 1: Alerta Glassmorphic (Cerrable si se pincha fuera) */}
       {voteStep === 'alert' && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 backdrop-blur-sm animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300"
           onClick={() => setVoteStep('idle')} // Cierra al pinchar fuera
         >
-          {/* Botón flotante estilo iOS */}
+          {/* Botón flotante estilo iOS / Premium GovTech */}
           <button 
             onClick={(e) => { e.stopPropagation(); setVoteStep('voting'); }}
-            className="glass-apple bg-primary/80 hover:bg-primary border-white/40 text-white rounded-[40px] px-8 py-5 flex items-center gap-4 transition-all hover:scale-105 active:scale-95 shadow-apple-lg"
+            className="bg-primary/90 hover:bg-primary border border-white/30 text-white rounded-[32px] px-8 py-5 flex items-center gap-5 transition-all duration-300 hover:scale-[1.03] active:scale-95 shadow-2xl shadow-primary/30 backdrop-blur-xl"
           >
-            <div className="bg-white/20 p-2 rounded-full"><Megaphone size={24} /></div>
+            <div className="bg-white/20 p-3 rounded-full shadow-inner border border-white/20 animate-pulse"><Megaphone size={24} /></div>
             <div className="text-left">
-              <p className="text-sm font-black tracking-wide">NUEVA VOTACIÓN ABIERTA</p>
-              <p className="text-xs font-medium text-white/80">Toca aquí para participar</p>
+              <p className="text-base font-black tracking-wide drop-shadow-sm">NUEVA VOTACIÓN ABIERTA</p>
+              <p className="text-sm font-medium text-white/90">Toca aquí para participar</p>
             </div>
           </button>
         </div>
@@ -291,50 +290,55 @@ export default function VecinoDashboard() {
 
       {/* PASO 2 AL 5: Panel de Votación (No cerrable pinchando fuera por seguridad) */}
       {['voting', 'confirm', 'security', 'success'].includes(voteStep) && (
-        <div className="fixed inset-0 z-50 flex justify-center items-end sm:items-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex justify-center items-end sm:items-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-lg animate-in fade-in duration-300">
           
-          <div className="w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-4 duration-300">
+          <div className="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl border border-white/20 flex flex-col overflow-hidden animate-in slide-in-from-bottom-12 sm:zoom-in-95 duration-500">
             
             {/* Header del Panel */}
-            <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <div className="flex items-center gap-2">
-                <ShieldCheck size={20} className="text-primary" />
-                <span className="font-bold text-slate-900 text-sm">Votación Oficial y Vinculante</span>
+            <div className="px-6 py-5 border-b border-slate-100/80 flex justify-between items-center bg-white/90 backdrop-blur-md">
+              <div className="flex items-center gap-2.5">
+                <div className="bg-primary/10 p-1.5 rounded-full"><ShieldCheck size={18} className="text-primary" /></div>
+                <span className="font-black text-slate-900 text-sm tracking-tight">Votación Oficial y Vinculante</span>
               </div>
               {voteStep === 'voting' && (
-                <button onClick={() => setVoteStep('idle')} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><X size={18} className="text-slate-500"/></button>
+                <button onClick={() => setVoteStep('idle')} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-full transition-all active:scale-95"><X size={18} className="text-slate-600"/></button>
               )}
             </div>
 
-            <div className="p-6">
+            <div className="p-6 sm:p-8">
               
               {/* PASO 2: Selección de Opciones */}
               {voteStep === 'voting' && (
-                <div className="space-y-6 animate-in slide-in-from-right-4">
+                <div className="space-y-7 animate-in slide-in-from-right-8 duration-500">
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 leading-tight mb-2">Aprobación Presupuesto Fachada Sede Central</h3>
-                    <p className="text-sm text-slate-500 font-medium">Convocado por: Directiva JV Amanecer</p>
-                    <p className="text-xs text-slate-400 mt-1">Quórum requerido: 50% + 1</p>
+                    <h3 className="text-2xl font-black text-slate-900 leading-tight mb-3 tracking-tight">Aprobación Presupuesto Fachada Sede Central</h3>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm text-slate-500 font-medium flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span> Convocado por: Directiva JV Amanecer
+                      </p>
+                      <p className="text-xs text-slate-400 font-medium ml-3.5">Quórum requerido: 50% + 1</p>
+                    </div>
                   </div>
 
                   {/* Temporizador */}
-                  <div className="flex items-center justify-center gap-2 bg-accent-light text-accent py-2 px-4 rounded-xl font-mono font-bold text-lg border border-accent/20">
-                    <Clock size={18} /> <CountdownTimer />
+                  <div className="flex items-center justify-center gap-2 bg-amber-50 text-amber-600 py-3 px-4 rounded-2xl font-mono font-bold text-xl border border-amber-200/50 shadow-sm">
+                    <Clock size={20} className="animate-pulse" /> <CountdownTimer />
                   </div>
 
                   {/* Opciones */}
-                  <div className="space-y-3 pt-2 border-t border-slate-100">
+                  <div className="space-y-3 pt-3">
                     {['Apruebo', 'Rechazo', 'Abstención'].map((opt) => (
                       <button 
                         key={opt}
                         onClick={() => setSelectedOption(opt)}
-                        className={`w-full py-4 rounded-2xl border-2 font-bold transition-all text-sm ${
+                        className={`w-full py-4 px-6 rounded-2xl border-2 font-black transition-all duration-300 text-base flex justify-between items-center ${
                           selectedOption === opt 
-                            ? 'border-primary bg-primary-light text-primary' 
-                            : 'border-slate-100 bg-white text-slate-600 hover:border-slate-200'
+                            ? 'border-primary bg-primary/5 text-primary shadow-md shadow-primary/10 scale-[1.02]' 
+                            : 'border-slate-100 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:scale-[1.01]'
                         }`}
                       >
-                        {opt}
+                        <span>{opt}</span>
+                        {selectedOption === opt && <CheckCircle2 size={20} className="text-primary animate-in zoom-in" />}
                       </button>
                     ))}
                   </div>
@@ -342,7 +346,11 @@ export default function VecinoDashboard() {
                   <button 
                     disabled={!selectedOption}
                     onClick={() => setVoteStep('confirm')}
-                    className={`w-full py-4 rounded-2xl font-bold text-white transition-all ${selectedOption ? 'bg-primary hover:bg-primary-dark shadow-apple' : 'bg-slate-300 cursor-not-allowed'}`}
+                    className={`w-full py-4 rounded-2xl font-black text-white transition-all duration-300 text-lg ${
+                      selectedOption 
+                        ? 'bg-primary hover:bg-primary-dark shadow-xl shadow-primary/30 active:scale-95' 
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
                   >
                     Continuar
                   </button>
@@ -351,24 +359,29 @@ export default function VecinoDashboard() {
 
               {/* PASO 3: Confirmación Ciega */}
               {voteStep === 'confirm' && (
-                <div className="text-center space-y-6 animate-in slide-in-from-right-4">
-                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto">
-                    <AlertTriangle size={24} className="text-slate-600" />
+                <div className="text-center space-y-8 animate-in slide-in-from-right-8 duration-500">
+                  <div className="w-20 h-20 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center mx-auto shadow-inner relative">
+                    <div className="absolute inset-0 bg-amber-100 rounded-full animate-ping opacity-20"></div>
+                    <AlertTriangle size={32} className="text-amber-500" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 mb-2">Confirmación de Voto</h3>
-                    <p className="text-sm text-slate-500">Hernán Millahual V. (RUT: 17.XXX.XXX-X), usted está a punto de emitir su preferencia de forma inalterable. El voto es secreto.</p>
+                    <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight">Confirmación de Voto</h3>
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-left mb-4">
+                       <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                         <span className="font-bold text-slate-900">Hernán Millahual V.</span> (RUT: 17.XXX.XXX-X), usted está a punto de emitir su preferencia de forma inalterable. El voto es secreto y encriptado.
+                       </p>
+                    </div>
                   </div>
-                  <div className="flex gap-3">
-                    <button onClick={() => setVoteStep('voting')} className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50">Corregir</button>
-                    <button onClick={() => setVoteStep('security')} className="flex-1 py-3 rounded-xl bg-slate-900 text-white font-bold shadow-apple hover:bg-black">Sí, confirmar</button>
+                  <div className="flex gap-4 pt-2">
+                    <button onClick={() => setVoteStep('voting')} className="flex-1 py-4 rounded-2xl border-2 border-slate-200 font-bold text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95">Corregir</button>
+                    <button onClick={() => setVoteStep('security')} className="flex-1 py-4 rounded-2xl bg-slate-900 text-white font-bold shadow-xl shadow-slate-900/20 hover:bg-black transition-all active:scale-95">Sí, confirmar</button>
                   </div>
                 </div>
               )}
 
               {/* PASO 4: Autenticación y GPS */}
               {voteStep === 'security' && (
-                <div className="animate-in slide-in-from-right-4">
+                <div className="animate-in slide-in-from-right-8 duration-500">
                   <style>{`
                     @keyframes spin-reverse {
                       from { transform: rotate(360deg); }
@@ -386,41 +399,41 @@ export default function VecinoDashboard() {
                   `}</style>
                   
                   {gpsStatus === 'pending' ? (
-                    <form onSubmit={handleGpsAuth} className="space-y-6">
+                    <form onSubmit={handleGpsAuth} className="space-y-7">
                       <div className="text-center mb-6">
-                        <h3 className="text-lg font-black text-slate-900">Validación de Identidad</h3>
-                        <p className="text-xs text-slate-500 mt-1">Requerido por Ley 19.799 de Firma Electrónica</p>
+                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Firma Digital</h3>
+                        <p className="text-sm text-slate-500 mt-1 font-medium">Requerido por Ley 19.799 sobre Documentos Electrónicos</p>
                       </div>
 
-                      <div>
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Contraseña de acceso</label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3.5 text-slate-400" size={18} />
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Clave Única Vecinal</label>
+                        <div className="relative group">
+                          <Lock className="absolute left-4 top-4 text-slate-400 group-focus-within:text-primary transition-colors" size={20} />
                           <input 
                             type="password" 
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold focus:outline-none focus:border-primary" 
+                            className="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-base font-semibold focus:outline-none focus:border-primary focus:bg-white transition-all shadow-sm" 
                             placeholder="Ingresa tu clave secreta" 
                           />
                         </div>
                       </div>
 
-                      <div className="bg-secondary-light border border-secondary/20 p-4 rounded-xl flex items-start gap-3">
-                        <MapPin className="text-secondary shrink-0 mt-0.5" size={18} />
+                      <div className="bg-secondary/10 border border-secondary/20 p-5 rounded-2xl flex items-start gap-4 shadow-sm">
+                        <div className="bg-white p-2 rounded-full shadow-sm"><MapPin className="text-secondary" size={20} /></div>
                         <div>
-                          <p className="text-sm font-bold text-secondary-dark">Validación Territorial (GPS)</p>
-                          <p className="text-xs text-secondary/80 mt-1">La plataforma verificará que te encuentras dentro del radio del barrio Amanecer.</p>
+                          <p className="text-sm font-bold text-slate-900 mb-1">Validación Territorial (GPS)</p>
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed">Se verificará mediante GPS que te encuentras dentro del radio jurisdiccional del barrio Amanecer.</p>
                         </div>
                       </div>
 
                       {gpsError && (
-                        <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-start gap-3 animate-in shake">
-                          <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={18} />
+                        <div className="bg-red-50 border border-red-200 p-4 rounded-2xl flex items-start gap-3 animate-in shake">
+                          <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={20} />
                           <div>
-                            <p className="text-sm font-bold text-red-800">Ubicación Requerida</p>
-                            <p className="text-xs text-red-600 mt-1">{gpsError}</p>
+                            <p className="text-sm font-bold text-red-800 mb-0.5">Ubicación Requerida</p>
+                            <p className="text-xs text-red-600 font-medium">{gpsError}</p>
                           </div>
                         </div>
                       )}
@@ -428,14 +441,15 @@ export default function VecinoDashboard() {
                       <button 
                         type="submit" 
                         disabled={!password}
-                        className="w-full py-4 rounded-2xl bg-secondary text-white font-bold transition-all shadow-apple flex justify-center items-center gap-2 hover:bg-[#72A600] disabled:opacity-70"
+                        className="w-full py-4 rounded-2xl bg-secondary text-white font-black text-lg transition-all shadow-xl shadow-secondary/30 flex justify-center items-center gap-2 hover:bg-[#1f9d50] hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none"
                       >
-                        Emitir Voto Legalmente
+                        <ShieldCheck size={20} />
+                        Firmar y Emitir Voto
                       </button>
                     </form>
                   ) : (
-                    <div className="space-y-6 text-center py-4">
-                      <div className="relative h-48 w-full rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
+                    <div className="space-y-6 text-center py-4 animate-in fade-in duration-500">
+                      <div className="relative h-56 w-full rounded-3xl overflow-hidden border border-slate-200 shadow-inner">
                         {coords ? (
                           <>
                             <div className="absolute inset-0 bg-slate-900/10 pointer-events-none z-10" />
@@ -499,15 +513,19 @@ export default function VecinoDashboard() {
 
               {/* PASO 5: Éxito */}
               {voteStep === 'success' && (
-                <div className="text-center space-y-6 py-6 animate-in zoom-in-95 duration-500">
-                  <div className="w-20 h-20 bg-green-50 border-4 border-green-100 rounded-full flex items-center justify-center mx-auto shadow-inner">
-                    <CheckCircle2 size={40} className="text-green-500" />
+                <div className="text-center space-y-8 py-8 animate-in zoom-in-95 duration-700">
+                  <div className="w-24 h-24 bg-green-50 border-4 border-green-100 rounded-full flex items-center justify-center mx-auto shadow-inner relative">
+                    <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-30"></div>
+                    <CheckCircle2 size={48} className="text-green-500 animate-in zoom-in duration-300 delay-150" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-slate-900 mb-2">Voto Recibido</h3>
-                    <p className="text-sm text-slate-500">Hernán Millahual V. (RUT: 17.XXX.XXX-X), tu preferencia ha sido encriptada y validada geográficamente con éxito.</p>
+                    <h3 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">¡Voto Recibido!</h3>
+                    <p className="text-sm text-slate-600 font-medium leading-relaxed max-w-[280px] mx-auto">
+                      <span className="font-bold text-slate-900">Hernán Millahual V.</span><br />
+                      Tu preferencia ha sido encriptada y validada geográficamente con éxito.
+                    </p>
                   </div>
-                  <button onClick={() => { setVoteStep('idle'); setSelectedOption(null); setPassword(''); setGpsStatus('pending'); }} className="w-full py-4 rounded-2xl bg-slate-900 text-white font-bold shadow-apple hover:bg-black">
+                  <button onClick={() => { setVoteStep('idle'); setSelectedOption(null); setPassword(''); setGpsStatus('pending'); }} className="w-full py-4 rounded-2xl bg-slate-900 text-white font-black text-lg shadow-xl shadow-slate-900/20 hover:bg-black transition-all hover:scale-[1.02] active:scale-95">
                     Volver al Inicio
                   </button>
                 </div>

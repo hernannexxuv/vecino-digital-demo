@@ -1,18 +1,40 @@
 import { useState, useEffect } from 'react';
 import { 
   Users, CheckCircle2, Clock, Play, StopCircle, 
-  BarChart3, Megaphone, AlertCircle,
-  ChevronRight
+  BarChart3, Megaphone, AlertCircle, AlertTriangle, Scale,
+  ChevronRight, Sparkles, FileText, Lock
 } from 'lucide-react';
 
 type VoteStatus = 'setup' | 'active' | 'results';
+type RightTab = 'padron' | 'acta';
+type ActaStatus = 'redactando' | 'esperando_firmas' | 'firmada';
+
+const tiposVotacion = [
+  { id: 'ordinaria', label: 'Asamblea Ordinaria', quorum: 10 },
+  { id: 'estatutos', label: 'Aprobación de Estatutos', quorum: 50 },
+  { id: 'censura', label: 'Censura del Directorio', quorum: 66 },
+  { id: 'disolucion', label: 'Disolución de la Junta', quorum: 75 },
+];
 
 export default function AsambleaModule() {
   const [status, setStatus] = useState<VoteStatus>('setup');
-  const [quorumReq, setQuorumReq] = useState(50);
+  const [tipoVotacion, setTipoVotacion] = useState(tiposVotacion[0]);
   const [timerSet, setTimerSet] = useState(15);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [votosRealizados, setVotosRealizados] = useState(0);
+  
+  // Estado para el Acta y Secretario
+  const [rightTab, setRightTab] = useState<RightTab>('padron');
+  const [actaText, setActaText] = useState('En la ciudad, a la fecha, se inicia la asamblea ordinaria...\n\nTemas a tratar:\n1. ');
+  const [actaStatus, setActaStatus] = useState<ActaStatus>('redactando');
+  const [showSignModal, setShowSignModal] = useState(false);
+  const [password, setPassword] = useState('');
+
   const totalSocios = 142;
+  const sociosPresentes = 45;
+  const quorumReq = tipoVotacion.quorum;
+  const quorumRequeridoPersonas = Math.ceil((totalSocios * quorumReq) / 100);
+  const cumpleQuorum = sociosPresentes >= quorumRequeridoPersonas;
 
   // Simulación de vecinos votando en tiempo real
   useEffect(() => {
@@ -24,11 +46,37 @@ export default function AsambleaModule() {
     }
   }, [status, votosRealizados]);
 
+  // Manejo del temporizador
+  useEffect(() => {
+    if (status === 'active') {
+      setTimeLeft(timerSet * 60);
+    } else {
+      setTimeLeft(null);
+    }
+  }, [status, timerSet]);
+
+  useEffect(() => {
+    if (status === 'active' && timeLeft !== null && timeLeft > 0) {
+      const interval = setInterval(() => {
+        setTimeLeft(prev => (prev !== null && prev > 0 ? prev - 1 : 0));
+      }, 1000);
+      return () => clearInterval(interval);
+    } else if (status === 'active' && timeLeft === 0) {
+      setStatus('results');
+    }
+  }, [status, timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   const porcentajeActual = Math.round((votosRealizados / totalSocios) * 100);
   const quorumAlcanzado = porcentajeActual >= quorumReq;
 
   return (
-    <div className="h-auto lg:h-full flex flex-col gap-6">
+    <div className="min-h-full flex flex-col gap-6">
       
       {/* Header del Módulo */}
       <div className="card-apple p-6 flex justify-between items-center">
@@ -77,24 +125,70 @@ export default function AsambleaModule() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Quórum Requerido (%)</label>
-                  <input 
-                    type="range" min="10" max="100" value={quorumReq}
-                    onChange={(e) => setQuorumReq(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-primary"
-                  />
-                  <div className="flex justify-between mt-2 text-xs font-bold text-primary">
-                    <span>Mínimo: 10%</span>
-                    <span>Objetivo: {quorumReq}%</span>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">
+                    Tipo de Votación (Ley 19.418)
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {tiposVotacion.map(tv => (
+                      <button 
+                        key={tv.id}
+                        onClick={() => setTipoVotacion(tv)}
+                        className={`p-3 rounded-xl text-left text-xs font-bold border transition-all flex justify-between items-center ${tipoVotacion.id === tv.id ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-slate-500 border-slate-100 hover:border-slate-300'}`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Scale size={14} /> {tv.label}
+                        </span>
+                        <span className={`px-2 py-1 rounded-md text-[10px] ${tipoVotacion.id === tv.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                          {tv.quorum}%
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
+
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Asistencia Actual</h4>
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <div className="text-3xl font-black text-slate-900">{sociosPresentes}</div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase">Presentes</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-slate-500">{totalSocios}</div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase">Total Socios</div>
+                    </div>
+                  </div>
+                  
+                  <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-primary" style={{ width: `${(sociosPresentes / totalSocios) * 100}%` }} />
+                  </div>
+                </div>
+
+                {cumpleQuorum ? (
+                  <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-start gap-3 text-emerald-700">
+                    <CheckCircle2 size={18} className="shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-bold">Procede: Quórum legal alcanzado</p>
+                      <p className="text-[10px] mt-1 opacity-80">Se requieren {quorumRequeridoPersonas} socios ({tipoVotacion.quorum}%) y hay {sociosPresentes} presentes.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3 text-red-700">
+                    <AlertTriangle size={18} className="shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-bold">No procede: Quórum insuficiente según Ley 19.418</p>
+                      <p className="text-[10px] mt-1 opacity-80">Se requieren {quorumRequeridoPersonas} socios ({tipoVotacion.quorum}%) y solo hay {sociosPresentes} presentes.</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button 
                 onClick={() => setStatus('active')}
-                className="w-full btn-apple-primary py-4 flex items-center justify-center gap-2"
+                disabled={!cumpleQuorum}
+                className="w-full btn-apple-primary py-4 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Lanzar a Celulares de Socios <ChevronRight size={18} />
+                Enviar VOTACIÓN <ChevronRight size={18} />
               </button>
             </div>
           )}
@@ -107,7 +201,15 @@ export default function AsambleaModule() {
                   <h3 className="font-black text-slate-900">Votación en Curso</h3>
                   <p className="text-xs text-slate-500">Los vecinos están votando in situ.</p>
                 </div>
-                <div className="bg-red-50 text-red-500 px-3 py-1 rounded-full text-[10px] font-bold animate-pulse border border-red-100 uppercase">En Vivo</div>
+                <div className="flex items-center gap-2">
+                  {timeLeft !== null && (
+                    <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-black border border-slate-200 flex items-center gap-1">
+                      <Clock size={12} className={timeLeft <= 60 ? "text-red-500 animate-pulse" : "text-slate-400"} /> 
+                      <span className={timeLeft <= 60 ? "text-red-500" : ""}>{formatTime(timeLeft)}</span>
+                    </div>
+                  )}
+                  <div className="bg-red-50 text-red-500 px-3 py-1 rounded-full text-[10px] font-bold animate-pulse border border-red-100 uppercase">En Vivo</div>
+                </div>
               </div>
 
               {/* Barra de Quórum Animada */}
@@ -180,53 +282,160 @@ export default function AsambleaModule() {
           )}
         </div>
 
-        {/* PANEL DERECHO: LISTADO DE SOCIOS (TRANSPARENCIA) */}
+        {/* PANEL DERECHO: LISTADO DE SOCIOS (TRANSPARENCIA) Y ACTA */}
         <div className="lg:col-span-2 card-apple flex flex-col overflow-hidden min-h-[500px] lg:min-h-0">
-          <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-            <h3 className="text-sm font-bold text-slate-800">Padrón Electoral In Situ ({totalSocios} socios)</h3>
-            <div className="flex gap-4">
-              <div className="flex items-center gap-1 text-[10px] font-bold text-secondary">
-                <CheckCircle2 size={12} /> YA VOTÓ
-              </div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
-                <Clock size={12} /> PENDIENTE
-              </div>
+          <div className="p-0 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <div className="flex w-full">
+              <button 
+                onClick={() => setRightTab('padron')}
+                className={`flex-1 p-4 text-sm font-bold border-b-2 transition-all ${rightTab === 'padron' ? 'border-primary text-primary bg-white' : 'border-transparent text-slate-500 hover:bg-slate-100'}`}
+              >
+                Padrón Electoral ({totalSocios} socios)
+              </button>
+              <button 
+                onClick={() => setRightTab('acta')}
+                className={`flex-1 p-4 text-sm font-bold border-b-2 transition-all flex items-center justify-center gap-2 ${rightTab === 'acta' ? 'border-primary text-primary bg-white' : 'border-transparent text-slate-500 hover:bg-slate-100'}`}
+              >
+                <FileText size={16} /> Acta Oficial (Secretario)
+              </button>
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 scrollbar-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {/* Generamos una lista simulada de socios */}
-              {[...Array(16)].map((_, i) => {
-                // Secuencia pseudoaleatoria fija para evitar parpadeos al actualizar el estado
-                const ordenVoto = [7, 2, 14, 5, 11, 0, 9, 15, 3, 12, 8, 1, 10, 6, 13, 4];
-                // Calculamos si este socio ya votó basado en el progreso global
-                const yaVoto = ordenVoto[i] < (votosRealizados / totalSocios) * 16;
-                
-                return (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-2xl border border-slate-50 bg-white">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase">
-                        S{i+1}
-                      </div>
-                      <p className="text-xs font-bold text-slate-700">Socio Correlativo N°{100 + i}</p>
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-hidden bg-slate-50">
+            {rightTab === 'padron' ? (
+              <>
+                <div className="flex justify-end mb-4">
+                  <div className="flex gap-4">
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-secondary">
+                      <CheckCircle2 size={12} /> YA VOTÓ
                     </div>
-                    {yaVoto ? (
-                      <CheckCircle2 size={18} className="text-secondary" />
-                    ) : (
-                      <Clock size={18} className="text-slate-200" />
-                    )}
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
+                      <Clock size={12} /> PENDIENTE
+                    </div>
                   </div>
-                );
-              })}
-              <div className="col-span-full py-4 text-center">
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">... y 126 socios más registrados ...</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* Generamos una lista simulada de socios */}
+                  {[...Array(16)].map((_, i) => {
+                    // Secuencia pseudoaleatoria fija para evitar parpadeos al actualizar el estado
+                    const ordenVoto = [7, 2, 14, 5, 11, 0, 9, 15, 3, 12, 8, 1, 10, 6, 13, 4];
+                    // Calculamos si este socio ya votó basado en el progreso global
+                    const yaVoto = ordenVoto[i] < (votosRealizados / totalSocios) * 16;
+                    
+                    return (
+                      <div key={i} className="flex items-center justify-between p-3 rounded-2xl border border-slate-100 bg-white shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase">
+                            S{i+1}
+                          </div>
+                          <p className="text-xs font-bold text-slate-700">Socio Correlativo N°{100 + i}</p>
+                        </div>
+                        {yaVoto ? (
+                          <CheckCircle2 size={18} className="text-secondary" />
+                        ) : (
+                          <Clock size={18} className="text-slate-200" />
+                        )}
+                      </div>
+                    );
+                  })}
+                  <div className="col-span-full py-4 text-center">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">... y 126 socios más registrados ...</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="h-full flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-3 bg-slate-900 text-white flex justify-between items-center">
+                  <span className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    <FileText size={14} /> Libro de Actas Digital
+                  </span>
+                  <span className="text-[10px] px-2 py-1 bg-slate-800 rounded-lg text-slate-300 border border-slate-700">
+                    {actaStatus === 'redactando' ? 'En Redacción' : 'Esperando Firmas'}
+                  </span>
+                </div>
+                <textarea 
+                  className="flex-1 w-full p-6 outline-none resize-none text-sm text-slate-700 font-serif leading-relaxed"
+                  value={actaText}
+                  onChange={(e) => setActaText(e.target.value)}
+                  disabled={actaStatus !== 'redactando'}
+                  placeholder="Redacte aquí el acta de la asamblea..."
+                  spellCheck={false}
+                />
+                <div className="p-4 border-t border-slate-100 bg-slate-50">
+                  {actaStatus === 'redactando' ? (
+                    <button 
+                      onClick={() => setShowSignModal(true)}
+                      className="w-full btn-apple-primary py-3 flex items-center justify-center gap-2"
+                    >
+                      <Lock size={18} /> Cerrar Acta y Solicitar Firmas
+                    </button>
+                  ) : (
+                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center gap-3 text-amber-700">
+                      <Clock className="animate-pulse" size={20} />
+                      <span className="font-bold text-sm">Acta cerrada. Esperando firmas de los vecinos.</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
       </div>
+
+      {/* Botón Flotante: Asistente Legal IA */}
+      <button className="fixed bottom-6 right-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-full shadow-apple-lg flex items-center gap-3 hover:scale-105 transition-all z-40 group hover:pr-6 cursor-pointer border-2 border-white/20">
+        <div className="bg-white/20 p-2 rounded-full">
+          <Sparkles size={24} className="animate-pulse" />
+        </div>
+        <span className="font-black text-sm w-0 overflow-hidden group-hover:w-auto transition-all whitespace-nowrap opacity-0 group-hover:opacity-100 delay-75">
+          Asistente Legal IA (Ley 19.418)
+        </span>
+      </button>
+
+      {/* Modal de Firma del Secretario */}
+      {showSignModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm space-y-6 shadow-2xl animate-in zoom-in-95">
+            <div className="w-16 h-16 bg-primary-light text-primary rounded-2xl flex items-center justify-center mx-auto mb-2">
+              <Lock size={32} />
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-black text-slate-900">Firma del Secretario</h3>
+              <p className="text-sm text-slate-500 mt-2">Ingrese su contraseña de acceso para firmar digitalmente el acta y enviarla a los vecinos.</p>
+            </div>
+            
+            <input 
+              type="password" 
+              placeholder="Contraseña de Acceso" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-4 rounded-xl border-2 border-slate-100 focus:border-primary outline-none text-center tracking-widest font-bold"
+            />
+            
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={() => { setShowSignModal(false); setPassword(''); }}
+                className="flex-1 py-3 font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={() => {
+                  if(password.trim() !== '') {
+                    setActaStatus('esperando_firmas');
+                    setShowSignModal(false);
+                    setPassword('');
+                  }
+                }}
+                className="flex-1 py-3 font-bold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-apple transition-colors"
+              >
+                Firmar Acta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

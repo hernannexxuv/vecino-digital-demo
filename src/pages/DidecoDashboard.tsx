@@ -17,8 +17,9 @@ const recentActivity = [
 ];
 
 export default function DidecoDashboard() {
-  // Estado para controlar la visibilidad del Modal de Comunicados
+  // Estados para paneles modales
   const [showComunicadoModal, setShowComunicadoModal] = useState(false);
+  const [showReportSlideOver, setShowReportSlideOver] = useState(false);
   
   // Estados para los selectores del Modal
   const [alcance, setAlcance] = useState('toda_comuna');
@@ -26,7 +27,7 @@ export default function DidecoDashboard() {
   const [departamento, setDepartamento] = useState('social');
 
   return (
-    <div className="flex flex-col gap-6 lg:h-full relative">
+    <div className="flex flex-col gap-6 min-h-full relative">
       
       {/* Header Panel */}
       <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-apple flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 z-10">
@@ -50,7 +51,7 @@ export default function DidecoDashboard() {
             <span>Emitir Comunicado</span>
           </button>
           
-          <button className="btn-apple-primary px-6 py-3 flex-1 sm:flex-none flex items-center justify-center gap-2">
+          <button onClick={() => setShowReportSlideOver(true)} className="btn-apple-primary px-6 py-3 flex-1 sm:flex-none flex items-center justify-center gap-2">
             <BarChart3 size={18} />
             <span>Generar Reporte</span>
           </button>
@@ -138,6 +139,88 @@ export default function DidecoDashboard() {
           </div>
         </div>
       </div>
+
+      {/* ========================================== */}
+      {/* SLIDE-OVER: INFORME DE AUDITORÍA (PDF OFICIAL) */}
+      {/* ========================================== */}
+      {showReportSlideOver && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowReportSlideOver(false)} />
+          
+          <div className="relative w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            {/* Barra de herramientas */}
+            <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <span className="text-xs font-bold text-slate-400 uppercase">Previsualización de Documento Oficial</span>
+              <button onClick={() => setShowReportSlideOver(false)} className="p-2 hover:bg-slate-200 rounded-lg"><X size={18}/></button>
+            </div>
+
+            {/* Hoja de Reporte (Estética de Documento) */}
+            <div className="flex-1 overflow-auto p-12 bg-slate-100">
+              <div className="bg-white p-12 shadow-xl border border-slate-200 min-h-[800px]">
+                {/* Header del Documento */}
+                <div className="border-b-4 border-primary pb-6 mb-8 flex justify-between items-end">
+                  <div>
+                    <p className="font-black text-slate-800 text-lg">MUNICIPALIDAD DE TEMUCO</p>
+                    <p className="text-xs text-slate-500 font-bold">Dirección de Desarrollo Comunitario (DIDECO)</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-bold text-slate-800 uppercase">Informe de Gestión</p>
+                    <p className="text-[10px] text-slate-400">ID Auditoría: #TM-2026-9921</p>
+                  </div>
+                </div>
+
+                {/* Título */}
+                <h1 className="text-2xl font-black text-slate-900 mb-2">Informe de Cumplimiento Territorial</h1>
+                <p className="text-xs text-slate-500 mb-8">Periodo: Mayo 2026 | Estado: Auditoría en Curso</p>
+
+                {/* Secciones del Informe */}
+                <div className="space-y-8">
+                  <section>
+                    <h4 className="text-xs font-black text-primary uppercase mb-4 tracking-wider">1. Legalidad y Firmas (Ministro de Fe)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <p className="text-[10px] text-slate-500 font-bold uppercase">Actas Validadas</p>
+                        <p className="text-xl font-black text-slate-900">42 / 45</p>
+                      </div>
+                      <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <p className="text-[10px] text-slate-500 font-bold uppercase">Pendientes Validación</p>
+                        <p className="text-xl font-black text-accent">3</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h4 className="text-xs font-black text-primary uppercase mb-4 tracking-wider">2. Salud Financiera de las Juntas</h4>
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="text-slate-400 border-b border-slate-100">
+                          <th className="text-left py-2 font-bold uppercase">Macrosector</th>
+                          <th className="text-right py-2 font-bold uppercase">Ejecución</th>
+                          <th className="text-right py-2 font-bold uppercase">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody className="font-medium text-slate-700">
+                        <tr className="border-b border-slate-50"><td className="py-3">Amanecer</td><td className="text-right">$4.200.000</td><td className="text-right text-secondary font-bold">AL DÍA</td></tr>
+                        <tr className="border-b border-slate-50"><td className="py-3">Fundo el Carmen</td><td className="text-right">$2.100.000</td><td className="text-right text-secondary font-bold">AL DÍA</td></tr>
+                        <tr className="border-b border-slate-50"><td className="py-3">Pedro de Valdivia</td><td className="text-right">$850.000</td><td className="text-right text-accent font-bold">OBSERVADO</td></tr>
+                      </tbody>
+                    </table>
+                  </section>
+                </div>
+
+                <div className="mt-12 pt-8 border-t border-slate-200">
+                  <p className="text-[10px] text-slate-400">Documento generado automáticamente por Nexxuv GovTech para DIDECO Temuco. Este informe posee validez de auditoría interna.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 bg-white border-t border-slate-100 flex gap-3">
+              <button className="flex-1 btn-apple-secondary py-3">Descargar PDF</button>
+              <button className="flex-1 btn-apple-primary py-3">Enviar a Contraloría Interna</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========================================== */}
       {/* MODAL: EMISIÓN DE COMUNICADOS (Recomendación 3) */}

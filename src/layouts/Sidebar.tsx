@@ -11,15 +11,16 @@ import {
   ShieldAlert,
   AlertTriangle
 } from 'lucide-react';
-import type { Role } from '../data/mockData';
+import type { Role, DirectivaRole } from '../data/mockData';
 
 interface SidebarProps {
   currentRole: Role;
+  currentSubRole: DirectivaRole;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }
 
-export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps) {
+export default function Sidebar({ currentRole, currentSubRole, isOpen, setIsOpen }: SidebarProps) {
   const location = useLocation();
 
   const menuItems = {
@@ -33,26 +34,40 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
       { path: '/dideco/mapa', label: 'Mapa Smart City', icon: Map },
       { path: '/reportes', label: 'Gesti\u00f3n Ciudadana', icon: ShieldAlert },
     ],
-    directiva: [
-      { path: '/directiva/asamblea', label: 'Asambleas', icon: Users },
-      { path: '/directiva/tesoreria', label: 'Billetera Digital', icon: Wallet },
-      { path: '/directiva/firmas', label: 'Gestión de Firmas', icon: FileCheck },
-    ],
     vecino: [
       { path: '/inicio', label: 'Mi Barrio', icon: LayoutDashboard },
       { path: '/reportes', label: 'Reportar Incidencia', icon: AlertTriangle },
     ]
   };
 
-  const currentMenu = menuItems[currentRole] || [];
+  let currentMenu: any[] = [];
+  if (currentRole === 'superadmin' || currentRole === 'municipalidad' || currentRole === 'vecino') {
+    currentMenu = menuItems[currentRole];
+  } else if (currentRole === 'directiva') {
+    if (currentSubRole === 'presidente') {
+      currentMenu = [
+        { path: '/directiva/dashboard', label: 'Dashboard de Gestión', icon: LayoutDashboard },
+        { path: '/directiva/asamblea', label: 'Asambleas', icon: Users },
+      ];
+    } else if (currentSubRole === 'tesorero') {
+      currentMenu = [
+        { path: '/directiva/tesoreria', label: 'Billetera Digital', icon: Wallet },
+      ];
+    } else if (currentSubRole === 'secretario') {
+      currentMenu = [
+        { path: '/directiva/asamblea', label: 'Gestión de Actas', icon: Users },
+        { path: '/directiva/firmas', label: 'Gestión de Firmas', icon: FileCheck },
+      ];
+    }
+  }
 
   return (
     <aside className={`
-      absolute md:relative bg-white border-r border-slate-100 h-full flex flex-col transition-all duration-300 ease-in-out z-40 shadow-apple
+      absolute md:relative bg-white/80 backdrop-blur-xl border-r border-slate-200/60 h-full flex flex-col transition-all duration-300 ease-in-out z-40 shadow-[4px_0_24px_-12px_rgba(0,0,0,0.05)]
       ${isOpen ? 'w-64 translate-x-0' : 'w-64 -translate-x-full md:w-20 md:translate-x-0'}
     `}>
       {/* Header del Sidebar */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 bg-gradient-to-tr from-white to-primary-light/50 shrink-0">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200/60 bg-transparent shrink-0">
         {isOpen ? (
           <span className="font-extrabold text-xl tracking-tighter text-slate-900 truncate">
             SmartCity<span className="text-primary font-black">Temuco</span>
@@ -78,13 +93,13 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
               key={item.path}
               to={item.path}
               className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all duration-150
+                flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 group
                 ${isActive 
-                  ? 'bg-primary text-white shadow-apple-md hover:bg-primary-dark' 
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}
+                  ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm' 
+                  : 'text-slate-500 hover:bg-slate-100/50 hover:text-slate-900 border border-transparent'}
               `}
             >
-              <Icon size={20} className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+              <Icon size={20} className={`shrink-0 transition-colors ${isActive ? 'text-primary' : 'text-slate-400 group-hover:text-slate-500'}`} />
               {isOpen && <span className="truncate">{item.label}</span>}
             </Link>
           );
@@ -92,7 +107,7 @@ export default function Sidebar({ currentRole, isOpen, setIsOpen }: SidebarProps
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-slate-100 shrink-0">
+      <div className="p-3 border-t border-slate-200/60 shrink-0">
         <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors">
           <Settings size={20} className="text-slate-400 shrink-0" />
           {isOpen && <span className="truncate">Configuración</span>}

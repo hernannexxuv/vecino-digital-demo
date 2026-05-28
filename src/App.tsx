@@ -7,6 +7,7 @@ import DidecoDashboard from './pages/DidecoDashboard'; // Importamos la vista re
 import VecinoDashboard from './pages/VecinoDashboard';
 import MapaComunal from './pages/MapaComunal';
 import IncidenciasModule from './pages/IncidenciasModule';
+import PresidenteDashboard from './pages/PresidenteDashboard';
 
 // ==========================================
 // ENRUTADOR PRINCIPAL
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/reportes" element={<IncidenciasModule />} />
 
           {/* Rutas de Rol: Junta de Vecinos (Directiva) */}
+          <Route path="/directiva/dashboard" element={<PresidenteDashboard />} />
           <Route path="/directiva/asamblea" element={<AsambleaModule />} />
           <Route path="/directiva/tesoreria" element={<BilleteraModule />} />
           <Route path="/directiva/firmas" element={<FirmaModule />} />
