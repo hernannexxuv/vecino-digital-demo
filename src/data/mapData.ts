@@ -48,12 +48,12 @@ const macrosectores: Macrosector[] = [
   {
     id: 3,
     name: 'Pueblo Nuevo',
-    centerCoords: [-38.7183, -72.5833],
+    centerCoords: [-38.7285, -72.5780],
     status: 'warning',
     jvs: [
-      { id: 301, name: 'JV Pueblo Nuevo Alto', sectorId: 3, coords: [-38.7168, -72.5820], socios: 12, asambleasMes: 0, presidente: 'Sofía Melinao', hasAlerta: true },
-      { id: 302, name: 'JV Pueblo Nuevo Bajo', sectorId: 3, coords: [-38.7200, -72.5848], socios: 14, asambleasMes: 1, presidente: 'Carlos Huenchullán', hasAlerta: false },
-      { id: 303, name: 'JV El Carmen de Ñielol', sectorId: 3, coords: [-38.7172, -72.5875], socios: 8, asambleasMes: 0, presidente: 'Elena Carillanca', hasAlerta: true },
+      { id: 301, name: 'JV Pueblo Nuevo Alto', sectorId: 3, coords: [-38.7265, -72.5785], socios: 12, asambleasMes: 0, presidente: 'Sofía Melinao', hasAlerta: true },
+      { id: 302, name: 'JV Pueblo Nuevo Bajo', sectorId: 3, coords: [-38.7310, -72.5760], socios: 14, asambleasMes: 1, presidente: 'Carlos Huenchullán', hasAlerta: false },
+      { id: 303, name: 'JV El Carmen de Ñielol', sectorId: 3, coords: [-38.7290, -72.5795], socios: 8, asambleasMes: 0, presidente: 'Elena Carillanca', hasAlerta: true },
     ],
   },
   {
