@@ -69,11 +69,17 @@ export default function Sidebar({ currentRole, currentSubRole, isOpen, setIsOpen
       {/* Header del Sidebar */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200/60 bg-transparent shrink-0">
         {isOpen ? (
-          <span className="font-extrabold text-xl tracking-tighter text-slate-900 truncate">
-            SmartCity<span className="text-primary font-black">Temuco</span>
-          </span>
+          <img 
+            src="/logo-muni_Teuco.webp" 
+            alt="Ilustre Municipalidad de Temuco" 
+            className="h-9 w-auto object-contain"
+          />
         ) : (
-          <span className="font-black text-xl text-primary mx-auto">ST</span>
+          <img 
+            src="/logo-muni_Teuco.webp" 
+            alt="Muni Temuco" 
+            className="h-8 w-auto object-contain mx-auto"
+          />
         )}
         <button 
           onClick={() => setIsOpen(!isOpen)}

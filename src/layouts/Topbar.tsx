@@ -33,13 +33,18 @@ export default function Topbar({ currentRole, setCurrentRole, currentSubRole, se
 
   return (
     <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-4 md:px-6 z-20 shadow-sm">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <button 
           onClick={toggleSidebar}
           className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors md:hidden"
         >
           <Menu size={20} />
         </button>
+        <img 
+          src="/logo-muni_Teuco.webp" 
+          alt="Ilustre Municipalidad de Temuco" 
+          className="h-8 w-auto object-contain shrink-0" 
+        />
         <h1 className="text-lg font-bold text-slate-900 hidden sm:block tracking-tighter">
           Plataforma GovTech · Ilustre Municipalidad de Temuco
         </h1>
